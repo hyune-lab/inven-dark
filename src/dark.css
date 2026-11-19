@@ -51,7 +51,7 @@ html[data-inven-dark="on"] iframe { color-scheme: normal; }
 /* ---- 밝은 배경을 가진 링크·배지(일반 규칙이 a·span 배경은 건드리지 않아 따로 지정) ---- */
 html[data-inven-dark="on"] body :is(a.promotion-wrap, a.btn, a.board-img, a.copy, a[class*="bttn"],
   a.refresh, a.more, a.link-more, a.game-countdown__panel, .benefits-item > a, a.hero-section__shop,
-  .popular-article a.row, .news-item > a, span.badge, span[class*="bttn"], span.recmtnick,
+  .popular-article a.row, .news-item > a, span[class*="badge"], span[class*="bttn"], span.recmtnick,
   span.tooltipText, .opinion-news-wrap a, span.sale) {
   background-color: var(--id-surface-2) !important;
   border-color: var(--id-border) !important;
@@ -99,3 +99,22 @@ html[data-inven-dark="on"] body .cate-area a:is(.active, :hover) {
 html[data-inven-dark="on"] body .articleCategory { width: auto !important; }
 /* 전광판 색 견본은 원래 색을 살렸으므로 그 위 글자도 원래 검정으로 */
 html[data-inven-dark="on"] body ul[id^="ESignWrite"] > li { color: #000 !important; }
+
+/* ---- 고정(sticky) 상단 메뉴: 스크롤하면 화면 위에 붙으므로 투명하면 뒤 내용이 비친다 ---- */
+html[data-inven-dark="on"] body :is(header.community-header, header.community-header .header-nav) {
+  background-color: var(--id-bg) !important;
+}
+html[data-inven-dark="on"] body header.community-header { border-bottom: 1px solid var(--id-border) !important; }
+
+/* ---- 베스트 댓글: 인벤 규칙(#powerbbsCmt2 ... li.bestCmt div.cmtOne, !important)보다 우선순위를 높여 덮는다 ---- */
+html[data-inven-dark="on"] body #powerbbsCmt2 .commentList1 ul li.bestCmt div.cmtOne,
+html[data-inven-dark="on"] body #powerbbsCmt2 .commentList1.bestComment ul li div.cmtOne {
+  background-color: #2a2226 !important;
+  border-color: #4a3036 !important;
+}
+
+/* 왼쪽 로그인 버튼: 게임마다 다른 색조는 살리고 검은 막을 덧씌워 흰 글자 대비를 4.5:1 이상으로 */
+html[data-inven-dark="on"] body .log-out a.login-btn {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.22), rgba(0, 0, 0, 0.22)) !important;
+  color: #fff !important;
+}
