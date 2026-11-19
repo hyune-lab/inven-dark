@@ -16,7 +16,7 @@
 스토어에 올리지 않은 확장이라, 처음 한 번은 아래처럼 직접 불러와야 합니다. 2분이면 됩니다.
 
 1. **파일 받기**
-   [최신 버전 받기(Releases)](https://github.com/hyune7142/inven-dark/releases/latest)에서 `inven-dark-v○.○.○.zip`을 내려받고 압축을 풉니다.
+   [최신 버전 받기(Releases)](https://github.com/hyune-lab/inven-dark/releases/latest)에서 `inven-dark-v○.○.○.zip`을 내려받고 압축을 풉니다.
    압축을 푼 폴더는 지우지 말고 원하는 곳에 두세요. 브라우저가 이 폴더를 계속 읽습니다.
 2. **확장 관리 화면 열기**
    주소창에 아래 주소를 입력합니다.
@@ -49,13 +49,13 @@
 
 ## 업데이트하는 법
 
-1. [Releases](https://github.com/hyune7142/inven-dark/releases/latest)에서 새 버전을 받습니다.
+1. [Releases](https://github.com/hyune-lab/inven-dark/releases/latest)에서 새 버전을 받습니다.
 2. 예전 폴더 안의 파일을 새 파일로 덮어씁니다.
 3. 확장 관리 화면에서 **인벤 다크 모드** 카드의 새로고침(↻) 버튼을 누르고, 인벤 탭도 새로고침합니다.
 
 ## 깨진 곳 제보
 
-흰 바탕이 남거나 글자가 안 보이는 곳이 있으면 [이슈](https://github.com/hyune7142/inven-dark/issues)로 알려 주세요. 아래 내용이 있으면 빨리 고칠 수 있습니다.
+흰 바탕이 남거나 글자가 안 보이는 곳이 있으면 [이슈](https://github.com/hyune-lab/inven-dark/issues)로 알려 주세요. 아래 내용이 있으면 빨리 고칠 수 있습니다.
 
 - 페이지 주소
 - 문제 부분이 보이는 화면 캡처 (가능하면 확장을 끈 화면도 함께)
