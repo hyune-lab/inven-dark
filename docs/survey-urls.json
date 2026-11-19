@@ -1,0 +1,402 @@
+[
+  {
+    "group": "A",
+    "url": "https://www.inven.co.kr/webzine/news/",
+    "key": "www.inven.co.kr/webzine/news?"
+  },
+  {
+    "group": "A",
+    "url": "https://www.inven.co.kr/webzine/news/?hotnews=1",
+    "key": "www.inven.co.kr/webzine/news?hotnews"
+  },
+  {
+    "group": "A",
+    "url": "https://www.inven.co.kr/webzine/news/?hotnews=4",
+    "key": "www.inven.co.kr/webzine/news?hotnews"
+  },
+  {
+    "group": "A",
+    "url": "https://www.inven.co.kr/webzine/news/?sclass=12&platform=gamereview",
+    "key": "www.inven.co.kr/webzine/news?platform&sclass"
+  },
+  {
+    "group": "A",
+    "url": "https://www.inven.co.kr/webzine/news/?sclass=11",
+    "key": "www.inven.co.kr/webzine/news?sclass"
+  },
+  {
+    "group": "A",
+    "url": "https://www.inven.co.kr/webzine/news/?sclass=24",
+    "key": "www.inven.co.kr/webzine/news?sclass"
+  },
+  {
+    "group": "A",
+    "url": "https://www.inven.co.kr/webzine/gameshow/",
+    "key": "www.inven.co.kr/webzine/gameshow?"
+  },
+  {
+    "group": "A",
+    "url": "https://www.inven.co.kr/webzine/news/?sclass=12&site=it&iskin=webzine",
+    "key": "www.inven.co.kr/webzine/news?iskin&sclass&site"
+  },
+  {
+    "group": "A",
+    "url": "https://www.inven.co.kr/webzine/news/?news=323490",
+    "key": "www.inven.co.kr/webzine/news?news"
+  },
+  {
+    "group": "A",
+    "url": "https://www.inven.co.kr/webzine/news/?news=323260",
+    "key": "www.inven.co.kr/webzine/news?news"
+  },
+  {
+    "group": "A",
+    "url": "https://www.inven.co.kr/webzine/news/?keyword=xsolla",
+    "key": "www.inven.co.kr/webzine/news?keyword"
+  },
+  {
+    "group": "A",
+    "url": "https://www.inven.co.kr/webzine/news/?site=it",
+    "key": "www.inven.co.kr/webzine/news?site"
+  },
+  {
+    "group": "A",
+    "url": "https://www.inven.co.kr/webzine/news/?site=gta6",
+    "key": "www.inven.co.kr/webzine/news?site"
+  },
+  {
+    "group": "A",
+    "url": "https://www.inven.co.kr/webzine/news/?news=320190&site=omenbyhp",
+    "key": "www.inven.co.kr/webzine/news?news&site"
+  },
+  {
+    "group": "A",
+    "url": "https://www.inven.co.kr/webzine/news/?news=318090&site=omenbyhp",
+    "key": "www.inven.co.kr/webzine/news?news&site"
+  },
+  {
+    "group": "A",
+    "url": "https://www.inven.co.kr/board/webzine/2097?iskin=webzine",
+    "key": "www.inven.co.kr/board/{game}/#?iskin"
+  },
+  {
+    "group": "A",
+    "url": "https://www.inven.co.kr/board/ib/6413?iskin=webzine",
+    "key": "www.inven.co.kr/board/{game}/#?iskin"
+  },
+  {
+    "group": "A",
+    "url": "https://www.inven.co.kr/board/webzine/2097/2754346?iskin=webzine",
+    "key": "www.inven.co.kr/board/{game}/#/#?iskin"
+  },
+  {
+    "group": "A",
+    "url": "https://www.inven.co.kr/board/webzine/2097/2754345?iskin=webzine",
+    "key": "www.inven.co.kr/board/{game}/#/#?iskin"
+  },
+  {
+    "group": "A",
+    "url": "https://www.inven.co.kr/webzine/news/?game=11934",
+    "key": "www.inven.co.kr/webzine/news?game"
+  },
+  {
+    "group": "A",
+    "url": "https://www.inven.co.kr/webzine/news/?game=13772",
+    "key": "www.inven.co.kr/webzine/news?game"
+  },
+  {
+    "group": "A",
+    "url": "https://www.inven.co.kr/webzine/news/?news=323311&iskin=maple",
+    "key": "www.inven.co.kr/webzine/news?iskin&news"
+  },
+  {
+    "group": "B",
+    "url": "https://gta6.inven.co.kr/",
+    "key": "gta6.inven.co.kr/?"
+  },
+  {
+    "group": "B",
+    "url": "https://df.inven.co.kr/",
+    "key": "df.inven.co.kr/?"
+  },
+  {
+    "group": "B",
+    "url": "https://crimson.inven.co.kr/",
+    "key": "crimson.inven.co.kr/?"
+  },
+  {
+    "group": "B",
+    "url": "https://maple.inven.co.kr/",
+    "key": "maple.inven.co.kr/?"
+  },
+  {
+    "group": "B",
+    "url": "https://lostark.inven.co.kr/",
+    "key": "lostark.inven.co.kr/?"
+  },
+  {
+    "group": "B",
+    "url": "https://aion2.inven.co.kr/",
+    "key": "aion2.inven.co.kr/?"
+  },
+  {
+    "group": "B",
+    "url": "https://fconline.inven.co.kr/",
+    "key": "fconline.inven.co.kr/?"
+  },
+  {
+    "group": "B",
+    "url": "https://lol.inven.co.kr/",
+    "key": "lol.inven.co.kr/?"
+  },
+  {
+    "group": "B",
+    "url": "https://black.inven.co.kr/",
+    "key": "black.inven.co.kr/?"
+  },
+  {
+    "group": "B",
+    "url": "https://wow.inven.co.kr/",
+    "key": "wow.inven.co.kr/?"
+  },
+  {
+    "group": "C",
+    "url": "https://gta6.inven.co.kr/dataninfo/movie/",
+    "key": "gta6.inven.co.kr/dataninfo/movie?"
+  },
+  {
+    "group": "C",
+    "url": "https://crimson.inven.co.kr/dataninfo/guide/",
+    "key": "crimson.inven.co.kr/dataninfo/guide?"
+  },
+  {
+    "group": "C",
+    "url": "https://crimson.inven.co.kr/dataninfo/quest/",
+    "key": "crimson.inven.co.kr/dataninfo/quest?"
+  },
+  {
+    "group": "C",
+    "url": "https://crimson.inven.co.kr/dataninfo/tips/",
+    "key": "crimson.inven.co.kr/dataninfo/tips?"
+  },
+  {
+    "group": "C",
+    "url": "https://crimson.inven.co.kr/dataninfo/guide/?bidx=314596",
+    "key": "crimson.inven.co.kr/dataninfo/guide?bidx"
+  },
+  {
+    "group": "C",
+    "url": "https://crimson.inven.co.kr/dataninfo/guide/?bidx=314598",
+    "key": "crimson.inven.co.kr/dataninfo/guide?bidx"
+  },
+  {
+    "group": "C",
+    "url": "https://lostark.inven.co.kr/dataninfo/item/",
+    "key": "lostark.inven.co.kr/dataninfo/item?"
+  },
+  {
+    "group": "C",
+    "url": "https://lostark.inven.co.kr/dataninfo/craft/",
+    "key": "lostark.inven.co.kr/dataninfo/craft?"
+  },
+  {
+    "group": "C",
+    "url": "https://lostark.inven.co.kr/dataninfo/skill/",
+    "key": "lostark.inven.co.kr/dataninfo/skill?"
+  },
+  {
+    "group": "C",
+    "url": "https://lostark.inven.co.kr/dataninfo/simulator/",
+    "key": "lostark.inven.co.kr/dataninfo/simulator?"
+  },
+  {
+    "group": "C",
+    "url": "https://lostark.inven.co.kr/dataninfo/arkpassive/",
+    "key": "lostark.inven.co.kr/dataninfo/arkpassive?"
+  },
+  {
+    "group": "C",
+    "url": "https://lostark.inven.co.kr/dataninfo/engrave/",
+    "key": "lostark.inven.co.kr/dataninfo/engrave?"
+  },
+  {
+    "group": "C",
+    "url": "https://lostark.inven.co.kr/dataninfo/quest/",
+    "key": "lostark.inven.co.kr/dataninfo/quest?"
+  },
+  {
+    "group": "C",
+    "url": "https://lostark.inven.co.kr/dataninfo/world/",
+    "key": "lostark.inven.co.kr/dataninfo/world?"
+  },
+  {
+    "group": "C",
+    "url": "https://lostark.inven.co.kr/dataninfo/guide/",
+    "key": "lostark.inven.co.kr/dataninfo/guide?"
+  },
+  {
+    "group": "C",
+    "url": "https://lostark.inven.co.kr/dataninfo/avatar/",
+    "key": "lostark.inven.co.kr/dataninfo/avatar?"
+  },
+  {
+    "group": "C",
+    "url": "https://lostark.inven.co.kr/dataninfo/crew/",
+    "key": "lostark.inven.co.kr/dataninfo/crew?"
+  },
+  {
+    "group": "C",
+    "url": "https://lostark.inven.co.kr/dataninfo/heart/",
+    "key": "lostark.inven.co.kr/dataninfo/heart?"
+  },
+  {
+    "group": "C",
+    "url": "https://lostark.inven.co.kr/dataninfo/card/",
+    "key": "lostark.inven.co.kr/dataninfo/card?"
+  },
+  {
+    "group": "C",
+    "url": "https://aion2.inven.co.kr/db/",
+    "key": "aion2.inven.co.kr/db?"
+  },
+  {
+    "group": "C",
+    "url": "https://aion2.inven.co.kr/db/item/",
+    "key": "aion2.inven.co.kr/db/item?"
+  },
+  {
+    "group": "C",
+    "url": "https://aion2.inven.co.kr/db/craft/",
+    "key": "aion2.inven.co.kr/db/craft?"
+  },
+  {
+    "group": "D",
+    "url": "https://www.inven.co.kr/",
+    "key": "www.inven.co.kr/?"
+  },
+  {
+    "group": "D",
+    "url": "http://www.inven.co.kr/",
+    "key": "www.inven.co.kr/?"
+  },
+  {
+    "group": "D",
+    "url": "https://www.inven.co.kr/board/gta6/6358/119",
+    "key": "www.inven.co.kr/board/{game}/#/#?"
+  },
+  {
+    "group": "D",
+    "url": "https://www.inven.co.kr/board/party/6537/148",
+    "key": "www.inven.co.kr/board/{game}/#/#?"
+  },
+  {
+    "group": "D",
+    "url": "https://party.inven.co.kr/chzzk",
+    "key": "party.inven.co.kr/{party}?"
+  },
+  {
+    "group": "D",
+    "url": "https://party.inven.co.kr/travel",
+    "key": "party.inven.co.kr/{party}?"
+  },
+  {
+    "group": "D",
+    "url": "https://www.inven.co.kr/webzine/calendar/",
+    "key": "www.inven.co.kr/webzine/calendar?"
+  },
+  {
+    "group": "D",
+    "url": "https://www.inven.co.kr/webzine/calendar",
+    "key": "www.inven.co.kr/webzine/calendar?"
+  },
+  {
+    "group": "D",
+    "url": "https://www.inven.co.kr/webzine/zone/gamer/",
+    "key": "www.inven.co.kr/webzine/zone/gamer?"
+  },
+  {
+    "group": "D",
+    "url": "https://www.inven.co.kr/webzine/live/",
+    "key": "www.inven.co.kr/webzine/live?"
+  },
+  {
+    "group": "D",
+    "url": "https://it.inven.co.kr/",
+    "key": "it.inven.co.kr/?"
+  },
+  {
+    "group": "D",
+    "url": "https://www.inven.co.kr/webzine/invengames/",
+    "key": "www.inven.co.kr/webzine/invengames?"
+  },
+  {
+    "group": "D",
+    "url": "https://imart.inven.co.kr/",
+    "key": "imart.inven.co.kr/?"
+  },
+  {
+    "group": "D",
+    "url": "https://www.inven.co.kr/webzine/calendar/game/13864",
+    "key": "www.inven.co.kr/webzine/calendar/game/#?"
+  },
+  {
+    "group": "D",
+    "url": "https://www.inven.co.kr/webzine/calendar/game/11934",
+    "key": "www.inven.co.kr/webzine/calendar/game/#?"
+  },
+  {
+    "group": "D",
+    "url": "https://www.inven.co.kr/event/sp/temppal",
+    "key": "www.inven.co.kr/event/sp/temppal?"
+  },
+  {
+    "group": "D",
+    "url": "https://tr.inven.co.kr/view/18841",
+    "key": "tr.inven.co.kr/view/#?"
+  },
+  {
+    "group": "D",
+    "url": "https://tr.inven.co.kr/view/18831",
+    "key": "tr.inven.co.kr/view/#?"
+  },
+  {
+    "group": "D",
+    "url": "https://pick.inven.co.kr/campaign/1001",
+    "key": "pick.inven.co.kr/campaign/#?"
+  },
+  {
+    "group": "D",
+    "url": "https://pick.inven.co.kr/campaign/1002",
+    "key": "pick.inven.co.kr/campaign/#?"
+  },
+  {
+    "group": "D",
+    "url": "https://www.inven.co.kr/event/aion2/anniversary/1st/",
+    "key": "www.inven.co.kr/event/aion2/anniversary/1st?"
+  },
+  {
+    "group": "D",
+    "url": "https://www.inven.co.kr/board/party/6387",
+    "key": "www.inven.co.kr/board/{game}/#?"
+  },
+  {
+    "group": "D",
+    "url": "https://www.inven.co.kr/board/it/2631",
+    "key": "www.inven.co.kr/board/{game}/#?"
+  },
+  {
+    "group": "D",
+    "url": "https://party.inven.co.kr/hotdeal/list/",
+    "key": "party.inven.co.kr/{party}/list?"
+  },
+  {
+    "group": "D",
+    "url": "https://party.inven.co.kr/hotdeal/view/198074",
+    "key": "party.inven.co.kr/{party}/view/#?"
+  },
+  {
+    "group": "D",
+    "url": "https://party.inven.co.kr/hotdeal/view/198080",
+    "key": "party.inven.co.kr/{party}/view/#?"
+  }
+]
