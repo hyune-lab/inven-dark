@@ -33,7 +33,7 @@ export function contrastIssues(page) {
       if (![...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim())) continue;
       const cs = getComputedStyle(e);
       const r = e.getBoundingClientRect();
-      if (!r.width || !r.height || cs.visibility === 'hidden' || e.closest('[style*="opacity: 0"], [aria-hidden="true"]')) continue;
+      if (!r.width || !r.height || cs.visibility === 'hidden' || e.closest('[style*="opacity: 0"], [aria-hidden="true"], .blind, .is-blind, .sr-only, .vjs-control-text')) continue; // 화면에 안 보이는 접근성용 글자 제외
       let bg = null;
       for (let x = e; x; x = x.parentElement) {
         const s = getComputedStyle(x);
