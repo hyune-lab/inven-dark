@@ -118,3 +118,46 @@ html[data-inven-dark="on"] body .log-out a.login-btn {
   background-image: linear-gradient(rgba(0, 0, 0, 0.22), rgba(0, 0, 0, 0.22)) !important;
   color: #fff !important;
 }
+
+/* ---- 글쓴이 프로필 카드 ----
+   꾸미기 그림을 고른 카드는 그림과 원래 글자색을 그대로 둔다.
+   그림을 고르지 않은 기본 카드(흰 기본 그림)는 그림을 걷어 내고 어두운 표면 + 본문 글자색으로.
+   shortcut: 기본 그림을 파일 이름(i8244447807)으로 알아본다, 인벤이 기본 그림을 바꾸면 이 이름을 갱신. */
+html[data-inven-dark="on"] body .inventory-section .summary[style*="i8244447807"] {
+  background-image: none !important;
+  background-color: #1f2026 !important;
+  border: 1px solid var(--id-border) !important;
+  border-radius: 8px 8px 0 0;
+}
+html[data-inven-dark="on"] body .inventory-section .summary[style*="i8244447807"] :is(p, span, strong, b) {
+  color: var(--id-text) !important;
+}
+/* "이미지를 등록해 주세요" 기본 그림(흰 원)만 어둡게 뒤집는다. 사용자가 올린 사진은 그림 주소가 달라 걸리지 않는다. */
+html[data-inven-dark="on"] body .profile_icon:has(image[*|href*="profileimg_none"]) .profile_image-wrap {
+  filter: invert(0.88) hue-rotate(180deg);
+}
+/* 아래 탭 줄과 펼침 내용 영역 */
+html[data-inven-dark="on"] body .inventory-section .inventory_content_wrap {
+  background-color: #1f2026 !important;
+  border: 1px solid var(--id-border) !important;
+}
+html[data-inven-dark="on"] body .inventory-section ul.tabs button.active {
+  background-color: #3a3d48 !important;
+  color: var(--id-text) !important;
+}
+/* 메뉴 접기·펼치기: 스킨 색 그림 대신 다른 버튼과 같은 칩 */
+html[data-inven-dark="on"] body .inventory-section :is(button.btn_close, button.btn_open) {
+  background-image: none !important;
+  background-color: var(--id-surface-2) !important;
+  border: 1px solid var(--id-border) !important;
+  border-radius: 4px;
+  color: var(--id-text) !important;
+  text-indent: 0 !important; /* 원래 글자는 그림 속에 있고 실제 글자는 화면 밖으로 밀어 둔다 */
+  font-size: 12px !important;
+}
+
+/* ---- GNB "뉴스" 펼침의 회색 단색 선 아이콘만 밝게. 제목에 인라인 색이 붙은 항목(파랑 컬러 아이콘)은 제외 ---- */
+html[data-inven-dark="on"] body ul.main-menu-list > li:has(> a.main-menu[href*="/webzine/news/"])
+  .sub-menu:not(:has(.link-title[style*="color"])) .commu-img img {
+  filter: brightness(0) invert(0.82);
+}
