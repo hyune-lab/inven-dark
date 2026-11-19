@@ -1,9 +1,8 @@
 // 확장을 넣은 크로미움으로 인벤 화면을 캡처해 shots/에 저장한다. 사용: node scripts/shoot.mjs
 import { chromium } from 'playwright';
-import { mkdtempSync, mkdirSync, rmSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, realpathSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { createHash } from 'node:crypto';
-import { realpathSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
 const ext = resolve(import.meta.dirname, '..');
@@ -35,8 +34,40 @@ async function shot(name, url) {
   await page.screenshot({ path: join(out, `${name}.png`), fullPage: true });
 }
 
+// 펼침 메뉴가 있는 항목마다 마우스를 올려 캡처하고, 펼친 패널 배경이 불투명한지 확인한다.
+async function hoverShots(prefix, itemSel, panelSel) {
+  const items = await page.$$(itemSel);
+  if (!items.length) { failed++; console.log(`실패 펼침 ${prefix} 항목을 못 찾음`); }
+  for (const [i, item] of items.entries()) {
+    await item.hover();
+    await page.waitForTimeout(400);
+    const panel = await item.$(panelSel);
+    const box = panel && (await panel.boundingBox());
+    const alpha = panel && (await panel.evaluate((e) => {
+      const m = getComputedStyle(e).backgroundColor.match(/[\d.]+/g);
+      return m ? (m[3] === undefined ? 1 : +m[3]) : 0;
+    }));
+    const ok = Boolean(box && box.height > 0 && alpha === 1);
+    if (!ok) failed++;
+    const label = await item.evaluate((e) => e.textContent.trim().split(/\s+/)[0].slice(0, 10));
+    console.log(`${ok ? '통과' : '실패'} 펼침 ${prefix}-${i} '${label}' 배경 불투명도=${alpha}`);
+    const top = await item.boundingBox();
+    const x = Math.max(0, Math.min(top.x, box ? box.x : top.x) - 20);
+    const y = Math.max(0, top.y - 10);
+    const bottom = box ? box.y + box.height : top.y + top.height;
+    await page.screenshot({ path: join(out, `hover-${prefix}-${i}.png`), clip: { x, y, width: Math.min(1400 - x, Math.max(560, box ? box.width + 40 : 0)), height: bottom - y + 30 } });
+  }
+  await page.mouse.move(0, 0);
+}
+
 try {
   await shot('main', 'https://www.inven.co.kr/');
+  // 상단 GNB 펼침 메뉴와 게임 인벤 상단 메뉴(메이플) 펼침 메뉴
+  await page.goto(boards[1][1], { waitUntil: 'load', timeout: 30000 });
+  await page.waitForTimeout(1000);
+  await hoverShots('gnb', 'ul.main-menu-list > li:has(.sub-menu-wrap)', '.sub-menu-wrap');
+  await hoverShots('maple-menu', '#commu-nav li.system:has(> ol)', ':scope > ol');
+
   for (const [name, url] of boards) {
     await shot(`${name}-list`, url);
     // 공지를 뺀 일반 글 중 댓글이 달린 첫 글(댓글 화면까지 확인하려고)
