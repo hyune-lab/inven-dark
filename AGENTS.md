@@ -4,6 +4,6 @@
 
 # inven-dark
 
-깃 작업 방식: 미정 (단독 | 협업 — git-workflow 참고)
+깃 작업 방식: 단독 — `develop`에 바로 저장, 완성되면 `main`에 합침 (git-workflow)
 
 프로젝트 지침을 여기에 적는다.
