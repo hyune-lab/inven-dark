@@ -184,6 +184,8 @@ try {
 
   // 글 보기의 "댓글 보기" 새 창(베스트 댓글 포함)
   await shot('lostark-opinion', 'https://www.inven.co.kr/board/opinionbbs.php?come_idx=6271&l=4303145&iskin=');
+  // 글 보기 안의 베스트 댓글(답글인 베스트·사진 있는 베스트 포함)
+  await shot('lostark-best', 'https://www.inven.co.kr/board/lostark/6271/4321771');
   // 아이콘 창에서 고른 값이 열린 인벤 탭에 새로고침 없이 반영되는지(F-04)
   // 압축 해제 확장의 ID는 폴더 절대 경로의 sha256 앞 32자리를 a~p로 바꾼 값이다.
   const id = [...createHash('sha256').update(realpathSync(ext)).digest('hex').slice(0, 32)]
