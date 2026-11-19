@@ -55,7 +55,9 @@ html[data-inven-dark="on"] body :is(a.promotion-wrap, a.btn, a.board-img, a.copy
   a.refresh, a.more, a.link-more, a.game-countdown__panel, .benefits-item > a, a.hero-section__shop,
   .popular-article a.row, .news-item > a, span[class*="badge"], span[class*="bttn"], span.recmtnick,
   span.tooltipText, .opinion-news-wrap a, span.sale, a.tag-link, a.reviewCard__thumb, td.thumb > span,
-  span.news-hero__avatar) {
+  span.news-hero__avatar,
+  /* 묶음 B 게임 인벤 첫 화면: 썸네일 받침, 공략 바로가기 버튼 */
+  a.card-image, figure.gallery-board-thumb, span.tab-icons-thumb, .inven-guide-link-item a) {
   background-color: var(--id-surface-2) !important;
   border-color: var(--id-border) !important;
 }
@@ -188,3 +190,9 @@ html[data-inven-dark="on"] body :is(span.cate, span.currentpg) {
   background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)) !important;
   color: #fff !important;
 }
+
+/* ---- 묶음 B 게임 인벤 첫 화면 ---- */
+/* 게시판 위젯 머리의 탭 띠(실시간·주간 BEST)는 가상 요소로 깐 밝은 띠 */
+html[data-inven-dark="on"] body ul.tab-menu::after { background-color: var(--id-surface-2) !important; }
+/* 리뷰 점수 고리: 색 고리는 두고 안쪽 흰 원만 어둡게(점수 글자가 밝은 색이라) */
+html[data-inven-dark="on"] body :is(.score-ring, .score)::before { background-color: var(--id-bg) !important; }
