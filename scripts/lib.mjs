@@ -20,7 +20,8 @@ export async function launch() {
 }
 
 // 보이는 글자마다 실제 배경(조상까지 올라가 첫 불투명 배경)과 글자색 대비를 계산해 4.5:1 미만을 묶어서 돌려준다.
-// 배경 그림 위 글자는 색을 알 수 없어 건너뛴다.
+// 배경 그림 위 글자는 색을 알 수 없어 건너뛴다. 다크를 껐을 때(인벤 원래 화면)보다 나빠진 것만 센다:
+// 원래 디자인부터 흐린 글자는 우리가 바꿀 대상이 아니다.
 export function contrastIssues(page) {
   return page.evaluate(() => {
     const parse = (c) => (c.match(/[\d.]+/g) || []).map(Number);
@@ -28,12 +29,7 @@ export function contrastIssues(page) {
       const [r, g, b] = rgb.map((v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; });
       return 0.2126 * r + 0.7152 * g + 0.0722 * b;
     };
-    const groups = new Map();
-    for (const e of document.querySelectorAll('body *')) {
-      if (![...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim())) continue;
-      const cs = getComputedStyle(e);
-      const r = e.getBoundingClientRect();
-      if (!r.width || !r.height || cs.visibility === 'hidden' || e.closest('[style*="opacity: 0"], [aria-hidden="true"], .blind, .is-blind, .sr-only, .vjs-control-text')) continue; // 화면에 안 보이는 접근성용 글자 제외
+    const measure = (e) => {
       let bg = null;
       for (let x = e; x; x = x.parentElement) {
         const s = getComputedStyle(x);
@@ -41,19 +37,37 @@ export function contrastIssues(page) {
         const c = parse(s.backgroundColor);
         if (c.length >= 3 && (c[3] === undefined || c[3] >= 0.9)) { bg = c.slice(0, 3); break; }
       }
-      if (!bg) continue;
-      const fg = parse(cs.color);
+      if (!bg) return null;
+      const color = getComputedStyle(e).color;
+      const fg = parse(color);
       const a = fg[3] ?? 1;
       const mixed = fg.slice(0, 3).map((v, i) => v * a + bg[i] * (1 - a));
       const [hi, lo] = [lum(mixed), lum(bg)].sort((p, q) => q - p);
-      const ratio = (hi + 0.05) / (lo + 0.05);
-      if (ratio >= 4.5) continue;
+      return { ratio: (hi + 0.05) / (lo + 0.05), color, bg };
+    };
+    const low = [];
+    for (const e of document.querySelectorAll('body *')) {
+      if (![...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim())) continue;
+      const cs = getComputedStyle(e);
+      const r = e.getBoundingClientRect();
+      if (!r.width || !r.height || cs.visibility === 'hidden' || e.closest('[style*="opacity: 0"], [aria-hidden="true"], .blind, .is-blind, .sr-only, .vjs-control-text')) continue; // 화면에 안 보이는 접근성용 글자 제외
+      const m = measure(e);
+      if (m && m.ratio < 4.5) low.push([e, m]);
+    }
+    const html = document.documentElement;
+    const state = html.getAttribute('data-inven-dark');
+    html.setAttribute('data-inven-dark', 'off');
+    const orig = low.map(([e]) => measure(e));
+    if (state === null) html.removeAttribute('data-inven-dark'); else html.setAttribute('data-inven-dark', state);
+    const groups = new Map();
+    low.forEach(([e, m], i) => {
+      if (orig[i] && orig[i].ratio <= m.ratio + 0.01) return; // 원래 화면부터 이 정도였다
       const sel = `${e.tagName.toLowerCase()}${[...e.classList].slice(0, 2).map((c) => '.' + c).join('')} < ${e.parentElement.tagName.toLowerCase()}${[...e.parentElement.classList].slice(0, 2).map((c) => '.' + c).join('')}`;
-      const key = `${sel} 글자=${cs.color} 배경=rgb(${bg.join(', ')})`;
-      const g = groups.get(key) || { n: 0, ratio, text: e.textContent.trim().slice(0, 14) };
+      const key = `${sel} 글자=${m.color} 배경=rgb(${m.bg.join(', ')})`;
+      const g = groups.get(key) || { n: 0, ratio: m.ratio, text: e.textContent.trim().slice(0, 14) };
       g.n++;
       groups.set(key, g);
-    }
+    });
     return [...groups].map(([k, g]) => `${g.ratio.toFixed(2)}:1 ×${g.n} ${k} "${g.text}"`);
   });
 }
