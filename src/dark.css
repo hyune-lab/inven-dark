@@ -22,13 +22,16 @@ html[data-inven-dark="on"] body {
 /* ---- 보완 규칙(F-05): 전용 규칙이 없는 영역도 흰 바탕·검은 글자가 남지 않게 ---- */
 html[data-inven-dark="on"] body :is(div, section, article, aside, header, nav, footer, main,
   table, thead, tbody, tfoot, tr, td, th, caption, ul, ol, li, dl, dt, dd, form, fieldset,
-  p, h1, h2, h3, h4, h5, h6, label, blockquote, pre, center) {
+  p, h1, h2, h3, h4, h5, h6, label, blockquote, pre, center):not(:where(
+    /* 원래 어두운 배경이 의미인 요소: 전광판 띠·색 견본, 떠 있는 알림, 툴팁, 썸네일 설명 띠, 프로필 결과 창 */
+    #board-electric-target, ul[id^="ESignWrite"] > li, .colorPart, .textPreviewPart .text,
+    #comFloatAlert, .tooltip_wrap, .type02 p.text, .inven-profile-action-result)) {
   background-color: transparent !important;
   border-color: var(--id-border) !important;
 }
 html[data-inven-dark="on"] body :is(div, section, article, aside, header, nav, footer, main,
   table, td, th, caption, li, dt, dd, p, h1, h2, h3, h4, h5, h6, label, span, strong, b, em, i,
-  font, blockquote, pre, center, small, u):not(.inventory-section .summary *) {
+  font, blockquote, pre, center, small, u):not(:where(.inventory-section .summary *)) {
   color: var(--id-text) !important;
 }
 /* 위 예외: 글쓴이 프로필 카드 윗부분은 사용자가 고른 꾸미기 그림(대부분 밝음)과 그에 맞춘 글자색을 그대로 둔다. */
@@ -48,7 +51,8 @@ html[data-inven-dark="on"] iframe { color-scheme: normal; }
 /* ---- 밝은 배경을 가진 링크·배지(일반 규칙이 a·span 배경은 건드리지 않아 따로 지정) ---- */
 html[data-inven-dark="on"] body :is(a.promotion-wrap, a.btn, a.board-img, a.copy, a[class*="bttn"],
   a.refresh, a.more, a.link-more, a.game-countdown__panel, .benefits-item > a, a.hero-section__shop,
-  .popular-article a.row, .news-item > a, span.badge, span[class*="bttn"], span.recmtnick) {
+  .popular-article a.row, .news-item > a, span.badge, span[class*="bttn"], span.recmtnick,
+  span.tooltipText, .opinion-news-wrap a, span.sale) {
   background-color: var(--id-surface-2) !important;
   border-color: var(--id-border) !important;
 }
@@ -65,3 +69,33 @@ html[data-inven-dark="on"] body :is(a.btn-device-toggle, button.btn-all) {
 /* 글 본문 안 링크만 링크색으로 구분한다(목록 제목까지 파랗게 하면 산만하다). */
 html[data-inven-dark="on"] body #powerbbsContent a { color: var(--id-link) !important; }
 html[data-inven-dark="on"] body #powerbbsContent a:visited { color: var(--id-visited) !important; }
+
+/* ---- 마우스를 올리면 절대위치로 뜨는 펼침 메뉴·레이어: 투명하면 뒤 내용과 겹치므로 불투명하게 ---- */
+html[data-inven-dark="on"] body :is(.sub-menu-wrap, #commu-nav li.system > ol, #nickNameLayer) {
+  background-color: var(--id-surface-2) !important;
+  border: 1px solid var(--id-border) !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45) !important;
+}
+
+/* ---- 원래 색 띠·탭이 있던 곳: 원래 색은 밝은 글자와 대비가 모자라 어두운 표면 톤으로 구분만 남긴다 ---- */
+html[data-inven-dark="on"] body :is(nav#commu-nav, .left-menu > h3, ul.tab > li.on,
+  .calcu p.currentType, .schedule_title.tab) {
+  background-color: var(--id-surface-2) !important;
+}
+
+/* ---- 말머리·카테고리 필터를 칩으로 (어두운 칩 배경 + 대비 4.5:1 이상 글자) ---- */
+html[data-inven-dark="on"] body :is(.board-list span.category, .articleCategory, .cate-area a) {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 4px;
+  background-color: var(--id-surface-2) !important;
+  color: var(--id-muted) !important;
+}
+html[data-inven-dark="on"] body .cate-area a { padding: 2px 12px 3px; border-radius: 10px; }
+html[data-inven-dark="on"] body .cate-area a:is(.active, :hover) {
+  background-color: #3a3d48 !important;
+  color: var(--id-text) !important;
+}
+html[data-inven-dark="on"] body .articleCategory { width: auto !important; }
+/* 전광판 색 견본은 원래 색을 살렸으므로 그 위 글자도 원래 검정으로 */
+html[data-inven-dark="on"] body ul[id^="ESignWrite"] > li { color: #000 !important; }
