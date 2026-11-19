@@ -253,6 +253,26 @@ try {
   }
   console.log(`프로필 카드 캡처: 기본 ${cards.default}장, 꾸미기 그림 ${cards.skin}장`);
 
+  // "로아 프로필" 탭(캐릭터 연동한 글쓴이)을 열어 다크 끔/켬을 같은 자리에서 캡처해 비교한다
+  let loa = null;
+  for (const url of posts) {
+    await page.goto(url, { waitUntil: 'load', timeout: 30000 }).catch(() => {});
+    loa = await page.$('.inventory-section ul.tabs button:text("로아 프로필")');
+    if (loa) break;
+  }
+  if (loa) {
+    await loa.click();
+    await page.waitForTimeout(1500);
+    const card = await page.$('.inventory-section');
+    await card.evaluate((e) => window.scrollTo(0, e.getBoundingClientRect().top + window.scrollY - 150));
+    for (const mode of ['off', 'on']) {
+      await page.evaluate((m) => document.documentElement.setAttribute('data-inven-dark', m), mode);
+      await page.waitForTimeout(400);
+      await card.screenshot({ path: join(out, `loa-profile-${mode}.png`) });
+    }
+    console.log(`로아 프로필 캡처: ${page.url()}`);
+  } else console.log('로아 프로필 탭이 있는 글을 최근 40개에서 못 찾음');
+
   // 글 보기의 "댓글 보기" 새 창(베스트 댓글 포함)
   await shot('lostark-opinion', 'https://www.inven.co.kr/board/opinionbbs.php?come_idx=6271&l=4303145&iskin=');
   // 글 보기 안의 베스트 댓글(답글인 베스트·사진 있는 베스트 포함)
