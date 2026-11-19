@@ -54,7 +54,8 @@ html[data-inven-dark="on"] iframe { color-scheme: normal; }
 html[data-inven-dark="on"] body :is(a.promotion-wrap, a.btn, a.board-img, a.copy, a[class*="bttn"],
   a.refresh, a.more, a.link-more, a.game-countdown__panel, .benefits-item > a, a.hero-section__shop,
   .popular-article a.row, .news-item > a, span[class*="badge"], span[class*="bttn"], span.recmtnick,
-  span.tooltipText, .opinion-news-wrap a, span.sale) {
+  span.tooltipText, .opinion-news-wrap a, span.sale, a.tag-link, a.reviewCard__thumb, td.thumb > span,
+  span.news-hero__avatar) {
   background-color: var(--id-surface-2) !important;
   border-color: var(--id-border) !important;
 }
@@ -175,3 +176,15 @@ html[data-inven-dark="on"] body ul.main-menu-list > li:has(> a.main-menu[href*="
 }
 /* 목록 제목에 마우스를 올리면 뜨는 본문 미리보기 레이어(원래 흰 바탕·3px 여백) */
 html[data-inven-dark="on"] body .boardPreview { padding: 8px 10px !important; color: var(--id-text) !important; }
+
+/* ---- 묶음 A 뉴스·웹진 ---- */
+/* 기사 사진 설명: 밝은 띠 대신 투명 + 보조 글자색 */
+html[data-inven-dark="on"] body figcaption:not(:where(.table_wrap > .inventory-section *)) {
+  background-color: transparent !important;
+  color: var(--id-muted) !important;
+}
+/* 색깔 말머리 칩(유머·연예·이슈 등)과 현재 쪽 번호: 색조는 살리고 검은 막을 덧씌워 흰 글자 대비 확보 */
+html[data-inven-dark="on"] body :is(span.cate, span.currentpg) {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)) !important;
+  color: #fff !important;
+}
