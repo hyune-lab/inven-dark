@@ -164,6 +164,24 @@ try {
       await communityHover('lostark-view-scroll1000');
     }
   }
+  // 글쓴이 프로필 카드: 꾸미기 그림이 없는 기본 카드와 있는 카드를 각각 2장까지 요소 단위로 캡처
+  await page.goto(boards[0][1], { waitUntil: 'domcontentloaded', timeout: 30000 });
+  const posts = await page.evaluate(() => [...document.querySelectorAll('.board-list tbody tr:not(.notice) a.subject-link')].slice(0, 40).map((a) => a.href));
+  const cards = { default: 0, skin: 0 };
+  for (const url of posts) {
+    if (cards.default >= 2 && cards.skin >= 2) break;
+    await page.goto(url, { waitUntil: 'load', timeout: 30000 }).catch(() => {});
+    const card = await page.$('.inventory-section');
+    if (!card) continue;
+    // 흰 기본 그림(i8244447807)을 쓰면 기본 카드, 그 밖은 사용자가 고른 꾸미기 그림
+    const kind = (await card.evaluate((e) => e.querySelector('.summary')?.getAttribute('style')?.includes('i8244447807'))) ? 'default' : 'skin';
+    if (cards[kind] >= 2) continue;
+    await card.evaluate((e) => window.scrollTo(0, e.getBoundingClientRect().top + window.scrollY - 150)); // 고정 헤더에 가리지 않게
+    await page.waitForTimeout(500);
+    await card.screenshot({ path: join(out, `card-${kind}-${++cards[kind]}.png`) });
+  }
+  console.log(`프로필 카드 캡처: 기본 ${cards.default}장, 꾸미기 그림 ${cards.skin}장`);
+
   // 글 보기의 "댓글 보기" 새 창(베스트 댓글 포함)
   await shot('lostark-opinion', 'https://www.inven.co.kr/board/opinionbbs.php?come_idx=6271&l=4303145&iskin=');
   // 아이콘 창에서 고른 값이 열린 인벤 탭에 새로고침 없이 반영되는지(F-04)
