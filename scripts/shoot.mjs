@@ -1,11 +1,9 @@
 // 확장을 넣은 크로미움으로 인벤 화면을 캡처해 shots/에 저장한다. 사용: node scripts/shoot.mjs
-import { chromium } from 'playwright';
-import { mkdtempSync, mkdirSync, realpathSync, rmSync } from 'node:fs';
-import { tmpdir } from 'node:os';
+import { mkdirSync, realpathSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { join, resolve } from 'node:path';
+import { join } from 'node:path';
+import { ext, launch, contrastIssues } from './lib.mjs';
 
-const ext = resolve(import.meta.dirname, '..');
 const out = join(ext, 'shots');
 const boards = [
   ['lostark', 'https://www.inven.co.kr/board/lostark/6271'],
@@ -13,14 +11,7 @@ const boards = [
   ['diablo4', 'https://www.inven.co.kr/board/diablo4/6030'],
 ];
 mkdirSync(out, { recursive: true });
-const profile = mkdtempSync(join(tmpdir(), 'inven-dark-'));
-const ctx = await chromium.launchPersistentContext(profile, {
-  channel: 'chromium', // 확장은 일반 헤드리스에서 안 돌아 새 헤드리스 모드를 쓴다
-  colorScheme: 'dark',
-  viewport: { width: 1400, height: 900 },
-  args: [`--disable-extensions-except=${ext}`, `--load-extension=${ext}`],
-});
-const page = ctx.pages()[0] || (await ctx.newPage());
+const { ctx, page, close } = await launch();
 let failed = 0;
 
 async function shot(name, url) {
@@ -35,45 +26,11 @@ async function shot(name, url) {
   await contrastCheck(name);
 }
 
-// 보이는 글자마다 실제 배경(조상까지 올라가 첫 불투명 배경)과 글자색 대비를 계산해 4.5:1 미만을 출력한다.
-// 배경 그림 위 글자는 색을 알 수 없어 건너뛴다. 원래 디자인의 흐린 글자도 섞일 수 있어 실패로 세지 않는다.
+// 글자 대비 4.5:1 미만 목록을 출력한다. 원래 디자인의 흐린 글자도 섞일 수 있어 실패로 세지 않는다.
 async function contrastCheck(name) {
-  const rows = await page.evaluate(() => {
-    const parse = (c) => (c.match(/[\d.]+/g) || []).map(Number);
-    const lum = (rgb) => {
-      const [r, g, b] = rgb.map((v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; });
-      return 0.2126 * r + 0.7152 * g + 0.0722 * b;
-    };
-    const groups = new Map();
-    for (const e of document.querySelectorAll('body *')) {
-      if (![...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim())) continue;
-      const cs = getComputedStyle(e);
-      const r = e.getBoundingClientRect();
-      if (!r.width || !r.height || cs.visibility === 'hidden' || e.closest('[style*="opacity: 0"], [aria-hidden="true"]')) continue;
-      let bg = null;
-      for (let x = e; x; x = x.parentElement) {
-        const s = getComputedStyle(x);
-        if (s.backgroundImage !== 'none') break;
-        const c = parse(s.backgroundColor);
-        if (c.length >= 3 && (c[3] === undefined || c[3] >= 0.9)) { bg = c.slice(0, 3); break; }
-      }
-      if (!bg) continue;
-      const fg = parse(cs.color);
-      const a = fg[3] ?? 1;
-      const mixed = fg.slice(0, 3).map((v, i) => v * a + bg[i] * (1 - a));
-      const [hi, lo] = [lum(mixed), lum(bg)].sort((p, q) => q - p);
-      const ratio = (hi + 0.05) / (lo + 0.05);
-      if (ratio >= 4.5) continue;
-      const sel = `${e.tagName.toLowerCase()}${[...e.classList].slice(0, 2).map((c) => '.' + c).join('')} < ${e.parentElement.tagName.toLowerCase()}${[...e.parentElement.classList].slice(0, 2).map((c) => '.' + c).join('')}`;
-      const key = `${sel} 글자=${cs.color} 배경=rgb(${bg.join(', ')})`;
-      const g = groups.get(key) || { n: 0, ratio, text: e.textContent.trim().slice(0, 14) };
-      g.n++;
-      groups.set(key, g);
-    }
-    return [...groups].map(([k, g]) => `  ${g.ratio.toFixed(2)}:1 ×${g.n} ${k} "${g.text}"`);
-  });
+  const rows = await contrastIssues(page);
   console.log(`대비 경고 ${name}: ${rows.length}종`);
-  if (rows.length) console.log(rows.slice(0, 20).join('\n'));
+  if (rows.length) console.log(rows.slice(0, 20).map((r) => '  ' + r).join('\n'));
 }
 
 // position: fixed/sticky로 떠 있는 넓은 요소가 투명하면 뒤 내용이 비친다. 자신이나 거의 같은 크기의 자식이 불투명해야 한다.
@@ -297,7 +254,6 @@ try {
   if (other) failed++;
   console.log(`${other ? '실패' : '통과'} example.com data-inven-dark 속성 ${other ? '있음' : '없음'}`);
 } finally {
-  await ctx.close();
-  rmSync(profile, { recursive: true, force: true });
+  await close();
 }
 process.exitCode = failed ? 1 : 0;
