@@ -64,7 +64,12 @@ html[data-inven-dark="on"] body :is(a.promotion-wrap, a.btn, a.board-img, a.copy
   /* 묶음 B 게임 인벤 첫 화면: 썸네일 받침, 공략 바로가기 버튼 */
   a.card-image, figure.gallery-board-thumb, span.tab-icons-thumb, .inven-guide-link-item a,
   /* 묶음 C 게임 정보·도구: 선택 상자(select2) */
-  .select2-selection, .select2-dropdown, .select2-search__field, .main-event-article figure) {
+  .select2-selection, .select2-dropdown, .select2-search__field, .main-event-article figure,
+  /* 묶음 D 그 밖: 게임캘린더·인벤게임즈·픽·행사·핫딜의 밝은 칸 */
+  .inven-games__figure, .inven-games__info, a.calendar__btn, a.news__more, .game__tags span.tag, a.release__btn,
+  ul.newsList > li > a.thumb, span.ao-label, span.ao-news-comment__count, span.ao-news-emoji__count,
+  ul.filter-list a.tab, span.brand-name, li.item > a.link, .btn-wrap a.button, ul.tabs > li > a, .ao-hero__links a,
+  a.brand-link) {
   background-color: var(--id-surface-2) !important;
   border-color: var(--id-border) !important;
 }
@@ -194,7 +199,9 @@ html[data-inven-dark="on"] body figcaption:not(:where(.table_wrap > .inventory-s
 }
 /* 색깔 말머리 칩(유머·연예·이슈 등)과 현재 쪽 번호: 색조는 살리고 검은 막을 덧씌워 흰 글자 대비 확보 */
 html[data-inven-dark="on"] body :is(span.cate, span.currentpg, td > span.type,
-  button.btn_search, button.searchBtn, button.resetBtn, body.world li.on, body.world li.select) {
+  button.btn_search, button.searchBtn, button.resetBtn, body.world li.on, body.world li.select,
+  span.calendar__event-sort, li.item:is(.no1, .no2, .no3) > span, a.common-btn, form.norecom a.submit,
+  a.link-store, a.inven-youtube-subscribe, .hotdeal-view div.title > span, div.title > span[class=""]) {
   background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)) !important;
   color: #fff !important;
 }
@@ -215,3 +222,16 @@ html[data-inven-dark="on"] body.world #menu.menu-ui li.disabled * { color: #8d92
 html[data-inven-dark="on"] body.world #menu.menu-ui :is(li.on, li.select) * { color: #fff !important; }
 /* 등급 칩(색이 곧 등급)은 배경색과 원래 글자색을 그대로 */
 html[data-inven-dark="on"] body span.power[class*="grade-"] { color: #fff !important; }
+
+/* ---- 묶음 D 그 밖 ---- */
+/* 게시판 댓글 묶음 머리("701 ~ 번째 댓글"): 인벤의 ID 선택자 규칙보다 높여 덮는다 */
+html[data-inven-dark="on"] body #powerbbsCmt2 .commentList1 h3[class*="title678"] {
+  background-color: var(--id-surface-2) !important;
+  color: var(--id-text) !important;
+}
+/* 글 본문의 인라인 배경 강조: 형광펜 같은 색 강조는 살리고 글자를 진하게, 흰 바탕(흰 페이지에서 복사한 흔적)은 걷어 낸다 */
+html[data-inven-dark="on"] body #powerbbsContent span[style*="background"] { color: #111 !important; }
+html[data-inven-dark="on"] body #powerbbsContent span:is([style*="#ffffff" i], [style*="#fff;" i], [style*="255, 255, 255"]) {
+  background-color: transparent !important;
+  color: var(--id-text) !important;
+}
