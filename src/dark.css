@@ -27,7 +27,10 @@ html[data-inven-dark="on"] body :is(div, section, article, aside, header, nav, f
     #board-electric-target, ul[id^="ESignWrite"] > li, .colorPart, .textPreviewPart .text,
     #comFloatAlert, .tooltip_wrap, .type02 p.text, .inven-profile-action-result,
     /* 로스트아크 "로아 프로필" 탭 내용: 인벤이 처음부터 어두운 패널로 디자인한 영역이라 원래대로 둔다 */
-    .table_wrap > .inventory-section, .table_wrap > .inventory-section *)) {
+    .table_wrap > .inventory-section, .table_wrap > .inventory-section *,
+    /* 색이 상태를 뜻하는 곳: 로아 지도 메뉴의 켠 항목(파랑)·선택 지역(금색), 아이온2 DB 머리 띠·선택 탭 */
+    body.world li.on, body.world li.select,
+    header[class*="aion2-"], [class*="aion2-"] li.on)) {
   background-color: transparent !important;
   border-color: var(--id-border) !important;
 }
@@ -38,7 +41,9 @@ html[data-inven-dark="on"] body :is(div, section, article, aside, header, nav, f
 }
 /* 위 예외: 글쓴이 프로필 카드 윗부분은 사용자가 고른 꾸미기 그림(대부분 밝음)과 그에 맞춘 글자색을 그대로 둔다. */
 html[data-inven-dark="on"] body :is(input:not([type="image"]):not([type="checkbox"]):not([type="radio"]),
-  textarea, select, button):not(:where(.table_wrap > .inventory-section *)) {
+  textarea, select, button):not(:where(.table_wrap > .inventory-section *,
+    /* 원래 색으로 역할을 구분하는 버튼(검색 파랑·초기화 주황 등) */
+    button.btn_search, button.searchBtn, button.resetBtn)) {
   background-color: var(--id-surface-2) !important;
   color: var(--id-text) !important;
   border-color: var(--id-border) !important;
@@ -57,7 +62,9 @@ html[data-inven-dark="on"] body :is(a.promotion-wrap, a.btn, a.board-img, a.copy
   span.tooltipText, .opinion-news-wrap a, span.sale, a.tag-link, a.reviewCard__thumb, td.thumb > span,
   span.news-hero__avatar,
   /* 묶음 B 게임 인벤 첫 화면: 썸네일 받침, 공략 바로가기 버튼 */
-  a.card-image, figure.gallery-board-thumb, span.tab-icons-thumb, .inven-guide-link-item a) {
+  a.card-image, figure.gallery-board-thumb, span.tab-icons-thumb, .inven-guide-link-item a,
+  /* 묶음 C 게임 정보·도구: 선택 상자(select2) */
+  .select2-selection, .select2-dropdown, .select2-search__field, .main-event-article figure) {
   background-color: var(--id-surface-2) !important;
   border-color: var(--id-border) !important;
 }
@@ -186,7 +193,8 @@ html[data-inven-dark="on"] body figcaption:not(:where(.table_wrap > .inventory-s
   color: var(--id-muted) !important;
 }
 /* 색깔 말머리 칩(유머·연예·이슈 등)과 현재 쪽 번호: 색조는 살리고 검은 막을 덧씌워 흰 글자 대비 확보 */
-html[data-inven-dark="on"] body :is(span.cate, span.currentpg) {
+html[data-inven-dark="on"] body :is(span.cate, span.currentpg, td > span.type,
+  button.btn_search, button.searchBtn, button.resetBtn, body.world li.on, body.world li.select) {
   background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)) !important;
   color: #fff !important;
 }
@@ -196,3 +204,12 @@ html[data-inven-dark="on"] body :is(span.cate, span.currentpg) {
 html[data-inven-dark="on"] body ul.tab-menu::after { background-color: var(--id-surface-2) !important; }
 /* 리뷰 점수 고리: 색 고리는 두고 안쪽 흰 원만 어둡게(점수 글자가 밝은 색이라) */
 html[data-inven-dark="on"] body :is(.score-ring, .score)::before { background-color: var(--id-bg) !important; }
+
+/* ---- 묶음 C 게임 정보·도구 ---- */
+/* 로아 지도 메뉴: 꺼진 항목은 어두운 칸 + 흐린 글자(원래 회색 칸의 '꺼짐' 의미 유지) */
+html[data-inven-dark="on"] body.world #menu.menu-ui :is(li.disabled, li.search),
+html[data-inven-dark="on"] body.world #controller.menu-ui li.zoom-slider {
+  background-color: var(--id-surface-2) !important;
+}
+html[data-inven-dark="on"] body.world #menu.menu-ui li.disabled * { color: #8d929d !important; }
+html[data-inven-dark="on"] body.world #menu.menu-ui :is(li.on, li.select) * { color: #fff !important; }
