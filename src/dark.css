@@ -71,7 +71,7 @@ html[data-inven-dark="on"] body #powerbbsContent a { color: var(--id-link) !impo
 html[data-inven-dark="on"] body #powerbbsContent a:visited { color: var(--id-visited) !important; }
 
 /* ---- 마우스를 올리면 절대위치로 뜨는 펼침 메뉴·레이어: 투명하면 뒤 내용과 겹치므로 불투명하게 ---- */
-html[data-inven-dark="on"] body :is(.sub-menu-wrap, #commu-nav li.system > ol, #nickNameLayer) {
+html[data-inven-dark="on"] body :is(.sub-menu-wrap, #commu-nav li.system > ol, #nickNameLayer, .boardPreview) {
   background-color: var(--id-surface-2) !important;
   border: 1px solid var(--id-border) !important;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45) !important;
@@ -165,3 +165,5 @@ html[data-inven-dark="on"] body ul.main-menu-list > li:has(> a.main-menu[href*="
   .sub-menu:not(:has(.link-title[style*="color"])) .commu-img img {
   filter: brightness(0) invert(0.82);
 }
+/* 목록 제목에 마우스를 올리면 뜨는 본문 미리보기 레이어(원래 흰 바탕·3px 여백) */
+html[data-inven-dark="on"] body .boardPreview { padding: 8px 10px !important; color: var(--id-text) !important; }
