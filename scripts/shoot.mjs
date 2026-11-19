@@ -8,7 +8,7 @@ import { join, resolve } from 'node:path';
 const ext = resolve(import.meta.dirname, '..');
 const out = join(ext, 'shots');
 const boards = [
-  ['lostark', 'https://www.inven.co.kr/board/lostark/4811'],
+  ['lostark', 'https://www.inven.co.kr/board/lostark/6271'],
   ['maple', 'https://www.inven.co.kr/board/maple/5974'],
   ['diablo4', 'https://www.inven.co.kr/board/diablo4/6030'],
 ];
@@ -32,6 +32,81 @@ async function shot(name, url) {
   if (!ok) failed++;
   console.log(`${ok ? '통과' : '실패'} ${name} data-inven-dark=${attr} ${page.url()}`);
   await page.screenshot({ path: join(out, `${name}.png`), fullPage: true });
+  await contrastCheck(name);
+}
+
+// 보이는 글자마다 실제 배경(조상까지 올라가 첫 불투명 배경)과 글자색 대비를 계산해 4.5:1 미만을 출력한다.
+// 배경 그림 위 글자는 색을 알 수 없어 건너뛴다. 원래 디자인의 흐린 글자도 섞일 수 있어 실패로 세지 않는다.
+async function contrastCheck(name) {
+  const rows = await page.evaluate(() => {
+    const parse = (c) => (c.match(/[\d.]+/g) || []).map(Number);
+    const lum = (rgb) => {
+      const [r, g, b] = rgb.map((v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; });
+      return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    };
+    const groups = new Map();
+    for (const e of document.querySelectorAll('body *')) {
+      if (![...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim())) continue;
+      const cs = getComputedStyle(e);
+      const r = e.getBoundingClientRect();
+      if (!r.width || !r.height || cs.visibility === 'hidden' || e.closest('[style*="opacity: 0"], [aria-hidden="true"]')) continue;
+      let bg = null;
+      for (let x = e; x; x = x.parentElement) {
+        const s = getComputedStyle(x);
+        if (s.backgroundImage !== 'none') break;
+        const c = parse(s.backgroundColor);
+        if (c.length >= 3 && (c[3] === undefined || c[3] >= 0.9)) { bg = c.slice(0, 3); break; }
+      }
+      if (!bg) continue;
+      const fg = parse(cs.color);
+      const a = fg[3] ?? 1;
+      const mixed = fg.slice(0, 3).map((v, i) => v * a + bg[i] * (1 - a));
+      const [hi, lo] = [lum(mixed), lum(bg)].sort((p, q) => q - p);
+      const ratio = (hi + 0.05) / (lo + 0.05);
+      if (ratio >= 4.5) continue;
+      const sel = `${e.tagName.toLowerCase()}${[...e.classList].slice(0, 2).map((c) => '.' + c).join('')} < ${e.parentElement.tagName.toLowerCase()}${[...e.parentElement.classList].slice(0, 2).map((c) => '.' + c).join('')}`;
+      const key = `${sel} 글자=${cs.color} 배경=rgb(${bg.join(', ')})`;
+      const g = groups.get(key) || { n: 0, ratio, text: e.textContent.trim().slice(0, 14) };
+      g.n++;
+      groups.set(key, g);
+    }
+    return [...groups].map(([k, g]) => `  ${g.ratio.toFixed(2)}:1 ×${g.n} ${k} "${g.text}"`);
+  });
+  console.log(`대비 경고 ${name}: ${rows.length}종`);
+  if (rows.length) console.log(rows.slice(0, 20).join('\n'));
+}
+
+// position: fixed/sticky로 떠 있는 넓은 요소가 투명하면 뒤 내용이 비친다. 자신이나 거의 같은 크기의 자식이 불투명해야 한다.
+async function fixedCheck(name) {
+  const bad = await page.evaluate(() => {
+    const opaque = (e) => { const m = (getComputedStyle(e).backgroundColor.match(/[\d.]+/g) || []).map(Number); return m.length >= 3 && (m[3] === undefined || m[3] >= 0.95); };
+    const res = [];
+    for (const e of document.querySelectorAll('body *')) {
+      const cs = getComputedStyle(e);
+      if (cs.position !== 'fixed' && cs.position !== 'sticky') continue;
+      if (e.matches('.inven-float-alarm')) continue; // 원래 투명한 알림 묶음(안쪽 알림 상자만 불투명)
+      const r = e.getBoundingClientRect();
+      if (r.width < 300 || r.height < 30 || cs.display === 'none' || cs.visibility === 'hidden') continue;
+      const area = r.width * r.height;
+      const covered = opaque(e) || [...e.querySelectorAll('*')].some((d) => { const q = d.getBoundingClientRect(); return q.width * q.height >= 0.9 * area && opaque(d); });
+      if (!covered) res.push(`${e.tagName.toLowerCase()}.${[...e.classList].join('.')} ${Math.round(r.width)}x${Math.round(r.height)}`);
+    }
+    return res;
+  });
+  if (bad.length) failed++;
+  console.log(`${bad.length ? '실패' : '통과'} 고정 요소 불투명 ${name}${bad.length ? ': ' + bad.join(', ') : ''}`);
+}
+
+// 스크롤 위치별로 "커뮤니티" 펼침을 열어 화면을 캡처하고 패널 불투명을 확인한다.
+async function communityHover(name) {
+  const item = await page.$('ul.main-menu-list > li:has(.sub-menu-wrap):nth-child(2)') || await page.$('ul.main-menu-list > li:has(.sub-menu-wrap)');
+  await item.hover();
+  await page.waitForTimeout(500);
+  const alpha = await item.$eval('.sub-menu-wrap', (e) => { const m = getComputedStyle(e).backgroundColor.match(/[\d.]+/g); return m ? (m[3] === undefined ? 1 : +m[3]) : 0; });
+  if (alpha !== 1) failed++;
+  console.log(`${alpha === 1 ? '통과' : '실패'} 펼침 ${name} 배경 불투명도=${alpha}`);
+  await page.screenshot({ path: join(out, `hover-${name}.png`) });
+  await page.mouse.move(0, 0);
 }
 
 // 펼침 메뉴가 있는 항목마다 마우스를 올려 캡처하고, 펼친 패널 배경이 불투명한지 확인한다.
@@ -78,7 +153,19 @@ try {
     });
     if (href) await shot(`${name}-view`, href);
     else { failed++; console.log(`실패 ${name} 첫 글 주소를 못 찾음`); }
+    if (href && name === 'lostark') {
+      // 글 보기에서 스크롤 0과 1000(상단 메뉴가 화면 위에 고정된 상태)을 모두 확인
+      await page.evaluate(() => window.scrollTo(0, 0));
+      await communityHover('lostark-view-scroll0');
+      await page.mouse.wheel(0, 1000);
+      await page.waitForTimeout(800);
+      await fixedCheck('lostark-view-scroll1000');
+      await page.screenshot({ path: join(out, 'sticky-lostark-view.png') });
+      await communityHover('lostark-view-scroll1000');
+    }
   }
+  // 글 보기의 "댓글 보기" 새 창(베스트 댓글 포함)
+  await shot('lostark-opinion', 'https://www.inven.co.kr/board/opinionbbs.php?come_idx=6271&l=4303145&iskin=');
   // 아이콘 창에서 고른 값이 열린 인벤 탭에 새로고침 없이 반영되는지(F-04)
   // 압축 해제 확장의 ID는 폴더 절대 경로의 sha256 앞 32자리를 a~p로 바꾼 값이다.
   const id = [...createHash('sha256').update(realpathSync(ext)).digest('hex').slice(0, 32)]
