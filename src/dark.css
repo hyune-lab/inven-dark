@@ -213,3 +213,5 @@ html[data-inven-dark="on"] body.world #controller.menu-ui li.zoom-slider {
 }
 html[data-inven-dark="on"] body.world #menu.menu-ui li.disabled * { color: #8d929d !important; }
 html[data-inven-dark="on"] body.world #menu.menu-ui :is(li.on, li.select) * { color: #fff !important; }
+/* 등급 칩(색이 곧 등급)은 배경색과 원래 글자색을 그대로 */
+html[data-inven-dark="on"] body span.power[class*="grade-"] { color: #fff !important; }
