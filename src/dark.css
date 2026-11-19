@@ -1,0 +1,65 @@
+/* Inven Dark: 모든 규칙은 html[data-inven-dark="on"] 아래에만 건다.
+   배경색만 바꾸고 background-image는 건드리지 않아 로고·아이콘 스프라이트가 그대로 남는다.
+   img·video·iframe·canvas에는 어떤 규칙도 걸지 않는다(사진·이모티콘·광고 색 유지). */
+
+html[data-inven-dark="on"] {
+  --id-bg: #17181c;
+  --id-surface: #1f2026;
+  --id-surface-2: #262830;
+  --id-border: #2e3038;
+  --id-text: #d6d8de;
+  --id-muted: #9a9fab;
+  --id-link: #8fb4ff;
+  --id-visited: #b7a3ff;
+  --id-accent: #ffb86b;
+  color-scheme: dark;
+  background: var(--id-bg) !important;
+}
+
+html[data-inven-dark="on"] body {
+  background-color: var(--id-bg) !important;
+  color: var(--id-text) !important;
+}
+
+/* ---- 보완 규칙(F-05): 전용 규칙이 없는 영역도 흰 바탕·검은 글자가 남지 않게 ---- */
+html[data-inven-dark="on"] body :is(div, section, article, aside, header, nav, footer, main,
+  table, thead, tbody, tfoot, tr, td, th, caption, ul, ol, li, dl, dt, dd, form, fieldset,
+  p, h1, h2, h3, h4, h5, h6, label, blockquote, pre, center) {
+  background-color: transparent !important;
+  border-color: var(--id-border) !important;
+}
+html[data-inven-dark="on"] body :is(div, section, article, aside, header, nav, footer, main,
+  table, td, th, caption, li, dt, dd, p, h1, h2, h3, h4, h5, h6, label, span, strong, b, em, i,
+  font, blockquote, pre, center, small, u):not(.inventory-section .summary *) {
+  color: var(--id-text) !important;
+}
+/* 위 예외: 글쓴이 프로필 카드 윗부분은 사용자가 고른 꾸미기 그림(대부분 밝음)과 그에 맞춘 글자색을 그대로 둔다. */
+html[data-inven-dark="on"] body :is(input:not([type="image"]):not([type="checkbox"]):not([type="radio"]),
+  textarea, select, button) {
+  background-color: var(--id-surface-2) !important;
+  color: var(--id-text) !important;
+  border-color: var(--id-border) !important;
+}
+html[data-inven-dark="on"] body :is(input, textarea)::placeholder { color: var(--id-muted) !important; }
+html[data-inven-dark="on"] body a { color: var(--id-text) !important; }
+html[data-inven-dark="on"] body hr { border-color: var(--id-border) !important; }
+
+/* 페이지가 dark면 바깥 문서와 색 체계가 다른 iframe(광고·영상)에 흰 바탕이 깔리므로 원래 체계로 둔다. */
+html[data-inven-dark="on"] iframe { color-scheme: normal; }
+
+/* ---- 밝은 배경을 가진 링크·배지(일반 규칙이 a·span 배경은 건드리지 않아 따로 지정) ---- */
+html[data-inven-dark="on"] body :is(a.promotion-wrap, a.btn, a.board-img, a.copy, a[class*="bttn"],
+  a.refresh, a.more, a.link-more, a.game-countdown__panel, .benefits-item > a, a.hero-section__shop,
+  .popular-article a.row, .news-item > a, span.badge, span[class*="bttn"], span.recmtnick) {
+  background-color: var(--id-surface-2) !important;
+  border-color: var(--id-border) !important;
+}
+
+/* 댓글 입력란의 안내문은 흰 바탕 그림이라 다크에서 덩어리로 보인다. 입력하면 사라지는 안내라 숨긴다. */
+html[data-inven-dark="on"] body textarea.notice { background-image: none !important; }
+
+/* 상단 메뉴(GNB) 오른쪽의 검은 단색 SVG 아이콘(기기 전환·전체 메뉴)만 밝게 뒤집는다. 사진이 아닌 조작 아이콘이다. */
+html[data-inven-dark="on"] body :is(a.btn-device-toggle, button.btn-all) {
+  filter: invert(0.85);
+  background-color: transparent !important;
+}
