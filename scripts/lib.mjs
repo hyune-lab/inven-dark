@@ -75,6 +75,19 @@ export function whiteElements(page, limit = 12) {
       for (let x = e; x && x !== document.body && path.length < 3; x = x.parentElement) path.unshift(`${x.tagName.toLowerCase()}${x.id ? '#' + x.id : ''}${[...x.classList].slice(0, 2).map((c) => '.' + c).join('')}`);
       out.push({ area: Math.round(r.width * r.height), size: `${Math.round(r.width)}x${Math.round(r.height)}`, bg: cs.backgroundColor, sel: path.join(' > ') });
     }
+    // 가상 요소(::before/::after)로 깐 밝은 띠도 본다(크기는 계산된 너비·높이로)
+    for (const e of document.querySelectorAll('body *')) {
+      for (const ps of ['::before', '::after']) {
+        const cs = getComputedStyle(e, ps);
+        if (cs.content === 'none' || cs.display === 'none') continue;
+        const m = (cs.backgroundColor.match(/[\d.]+/g) || []).map(Number);
+        if (m.length < 3 || (m[3] !== undefined && m[3] < 0.5)) continue;
+        if ((0.2126 * m[0] + 0.7152 * m[1] + 0.0722 * m[2]) / 255 < 0.7) continue;
+        const area = (parseFloat(cs.width) || 0) * (parseFloat(cs.height) || 0);
+        if (area < 1500 || !e.getClientRects().length) continue;
+        out.push({ area: Math.round(area), size: `${cs.width}x${cs.height}`, bg: cs.backgroundColor, sel: `${e.tagName.toLowerCase()}${[...e.classList].slice(0, 2).map((c) => '.' + c).join('')}${ps}` });
+      }
+    }
     return out.sort((a, b) => b.area - a.area).slice(0, limit);
   }, limit);
 }
