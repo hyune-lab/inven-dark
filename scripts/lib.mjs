@@ -63,7 +63,7 @@ export function whiteElements(page, limit = 12) {
   return page.evaluate((limit) => {
     const out = [];
     for (const e of document.querySelectorAll('body *')) {
-      if (e.closest('img, video, canvas, iframe, svg')) continue;
+      if (e.closest('img, video, canvas, iframe, svg, .media-partnership')) continue; // 협력사 로고 칸은 일부러 흰 바탕 유지
       const cs = getComputedStyle(e);
       const m = (cs.backgroundColor.match(/[\d.]+/g) || []).map(Number);
       if (m.length < 3 || (m[3] !== undefined && m[3] < 0.5)) continue;
