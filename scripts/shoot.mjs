@@ -97,11 +97,77 @@ async function fixedCheck(name) {
   console.log(`${bad.length ? '실패' : '통과'} 고정 요소 불투명 ${name}${bad.length ? ': ' + bad.join(', ') : ''}`);
 }
 
+// 마우스를 올리기 전에 보이던 요소를 기억해 두고, 올린 뒤 새로 보이게 된 절대위치·고정 글자 레이어가
+// 투명하면 실패로 센다(뒤 내용과 겹쳐 안 읽힘). 자신이나 거의 같은 크기의 자식이 불투명해야 한다.
+const markVisible = () => page.evaluate(() => {
+  window.__invenDarkVisible = new Set([...document.querySelectorAll('body *')].filter((e) => e.getClientRects().length));
+});
+async function newLayerCheck(name) {
+  const bad = await page.evaluate(() => {
+    const seen = window.__invenDarkVisible || new Set();
+    const opaque = (e) => { const s = getComputedStyle(e); const m = (s.backgroundColor.match(/[\d.]+/g) || []).map(Number); return s.backgroundImage !== 'none' || (m.length >= 3 && (m[3] === undefined || m[3] >= 0.95)); };
+    const fresh = [...document.querySelectorAll('body *')].filter((e) => {
+      if (seen.has(e) || !e.getClientRects().length) return false;
+      const s = getComputedStyle(e);
+      return s.visibility !== 'hidden' && (s.position === 'absolute' || s.position === 'fixed');
+    });
+    const freshSet = new Set(fresh);
+    return fresh.filter((e) => {
+      if (freshSet.has(e.parentElement) || e.textContent.trim().length < 2) return false; // 새 레이어의 맨 바깥만 본다
+      const r = e.getBoundingClientRect();
+      const area = r.width * r.height;
+      if (area < 2000) return false;
+      return !(opaque(e) || [...e.querySelectorAll('*')].some((d) => { const q = d.getBoundingClientRect(); return q.width * q.height >= 0.9 * area && opaque(d); }));
+    }).map((e) => `${e.tagName.toLowerCase()}.${[...e.classList].join('.')}`);
+  });
+  if (bad.length) { failed++; console.log(`실패 떠 있는 글자 레이어 투명 ${name}: ${bad.join(', ')}`); }
+}
+
+// 목록 제목에 마우스를 올리면 뜨는 본문 미리보기(.boardPreview)를 확인한다.
+// 미리보기 스크립트는 로그인한 사용자에게만 내려와서, 안 뜨면 같은 클래스의 레이어를 띄워 CSS만 확인한다.
+async function previewCheck(name) {
+  let layer = null;
+  for (const a of (await page.$$('.board-list tbody tr:not(.notice) a.subject-link')).slice(0, 5)) {
+    await a.scrollIntoViewIfNeeded();
+    await markVisible();
+    await a.hover();
+    await page.waitForTimeout(1200);
+    await newLayerCheck(`${name} 제목`);
+    layer = await page.$('.boardPreview:visible');
+    if (layer) break;
+  }
+  let how = '실제';
+  if (!layer) {
+    how = '모형(로그인 전이라 실제 미리보기 안 뜸)';
+    await page.evaluate(() => {
+      const a = document.querySelector('.board-list tbody tr:not(.notice) a.subject-link');
+      const d = document.createElement('div');
+      d.className = 'boardPreview';
+      d.style.display = 'block';
+      d.textContent = '미리보기 확인용 문장입니다. 글 내용 앞부분이 여러 줄로 표시되는 자리이며 뒤의 목록 글자와 겹치지 않아야 합니다.';
+      a.closest('.board-list').appendChild(d); // 목록과 같은 쌓임 영역에 넣어야 실제처럼 목록 위에 뜬다
+      const base = (d.offsetParent || document.body).getBoundingClientRect();
+      const r = a.getBoundingClientRect();
+      d.style.left = `${r.left - base.left + 40}px`;
+      d.style.top = `${r.bottom - base.top + 6}px`;
+    });
+    layer = await page.$('.boardPreview:visible');
+  }
+  const alpha = await layer.evaluate((e) => { const m = getComputedStyle(e).backgroundColor.match(/[\d.]+/g); return m ? (m[3] === undefined ? 1 : +m[3]) : 0; });
+  if (alpha !== 1) failed++;
+  console.log(`${alpha === 1 ? '통과' : '실패'} 제목 미리보기(${how}) 배경 불투명도=${alpha}`);
+  await page.screenshot({ path: join(out, `hover-${name}-preview.png`) });
+  await page.evaluate(() => document.querySelectorAll('.boardPreview').forEach((e) => e.style.display = 'none'));
+  await page.mouse.move(0, 0);
+}
+
 // 스크롤 위치별로 "커뮤니티" 펼침을 열어 화면을 캡처하고 패널 불투명을 확인한다.
 async function communityHover(name) {
   const item = await page.$('ul.main-menu-list > li:has(.sub-menu-wrap):nth-child(2)') || await page.$('ul.main-menu-list > li:has(.sub-menu-wrap)');
+  await markVisible();
   await item.hover();
   await page.waitForTimeout(500);
+  await newLayerCheck(name);
   const alpha = await item.$eval('.sub-menu-wrap', (e) => { const m = getComputedStyle(e).backgroundColor.match(/[\d.]+/g); return m ? (m[3] === undefined ? 1 : +m[3]) : 0; });
   if (alpha !== 1) failed++;
   console.log(`${alpha === 1 ? '통과' : '실패'} 펼침 ${name} 배경 불투명도=${alpha}`);
@@ -114,8 +180,12 @@ async function hoverShots(prefix, itemSel, panelSel) {
   const items = await page.$$(itemSel);
   if (!items.length) { failed++; console.log(`실패 펼침 ${prefix} 항목을 못 찾음`); }
   for (const [i, item] of items.entries()) {
+    await page.mouse.move(0, 0);
+    await page.waitForTimeout(200);
+    await markVisible();
     await item.hover();
     await page.waitForTimeout(400);
+    await newLayerCheck(`${prefix}-${i}`);
     const panel = await item.$(panelSel);
     const box = panel && (await panel.boundingBox());
     const alpha = panel && (await panel.evaluate((e) => {
@@ -145,6 +215,7 @@ try {
 
   for (const [name, url] of boards) {
     await shot(`${name}-list`, url);
+    if (name === 'lostark') await previewCheck('lostark-list');
     // 공지를 뺀 일반 글 중 댓글이 달린 첫 글(댓글 화면까지 확인하려고)
     const href = await page.evaluate(() => {
       const rows = [...document.querySelectorAll('.board-list tbody tr:not(.notice)')];
