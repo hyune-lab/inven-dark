@@ -4,14 +4,12 @@
 
 html[data-inven-dark="on"] {
   --id-bg: #17181c;
-  --id-surface: #1f2026;
   --id-surface-2: #262830;
   --id-border: #2e3038;
   --id-text: #d6d8de;
   --id-muted: #9a9fab;
   --id-link: #8fb4ff;
   --id-visited: #b7a3ff;
-  --id-accent: #ffb86b;
   color-scheme: dark;
   background: var(--id-bg) !important;
 }
@@ -63,3 +61,7 @@ html[data-inven-dark="on"] body :is(a.btn-device-toggle, button.btn-all) {
   filter: invert(0.85);
   background-color: transparent !important;
 }
+
+/* 글 본문 안 링크만 링크색으로 구분한다(목록 제목까지 파랗게 하면 산만하다). */
+html[data-inven-dark="on"] body #powerbbsContent a { color: var(--id-link) !important; }
+html[data-inven-dark="on"] body #powerbbsContent a:visited { color: var(--id-visited) !important; }
