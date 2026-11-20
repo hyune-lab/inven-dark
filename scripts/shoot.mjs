@@ -42,6 +42,7 @@ async function fixedCheck(name) {
       const cs = getComputedStyle(e);
       if (cs.position !== 'fixed' && cs.position !== 'sticky') continue;
       if (e.matches('.inven-float-alarm')) continue; // 원래 투명한 알림 묶음(안쪽 알림 상자만 불투명)
+      if (e.querySelector('iframe') || /ad_?layer/i.test(e.id)) continue; // 광고 틀은 광고 색을 건드리지 않는다
       const r = e.getBoundingClientRect();
       if (r.width < 300 || r.height < 30 || cs.display === 'none' || cs.visibility === 'hidden') continue;
       const area = r.width * r.height;
@@ -234,6 +235,30 @@ try {
   await shot('lostark-opinion', 'https://www.inven.co.kr/board/opinionbbs.php?come_idx=6271&l=4303145&iskin=');
   // 글 보기 안의 베스트 댓글(답글인 베스트·사진 있는 베스트 포함)
   await shot('lostark-best', 'https://www.inven.co.kr/board/lostark/6271/4321771');
+  // 모바일 인벤(PC 창에서 연 m.inven.co.kr): PC 폭과 휴대폰 폭(390)에서 목록·글 보기, 스크롤 후 고정 탭 줄 불투명
+  const cdp = await ctx.newCDPSession(page);
+  for (const mobile of [false, true]) {
+    const tag = mobile ? 'm390' : 'mpc';
+    if (mobile) {
+      await page.setViewportSize({ width: 390, height: 844 });
+      await cdp.send('Network.setUserAgentOverride', { userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1' });
+    }
+    await shot(`${tag}-list`, 'https://m.inven.co.kr/board/lostark/6271');
+    await page.evaluate(() => window.scrollTo(0, 700));
+    await page.waitForTimeout(800);
+    await fixedCheck(`${tag}-list 스크롤 700`);
+    const bar = await page.evaluate(() => { const s = document.querySelector('section.tab-navi'); return s && `${getComputedStyle(s).position} ${getComputedStyle(s).backgroundColor}`; });
+    const barOk = Boolean(bar && /fixed|sticky/.test(bar) && !/rgba\(0, 0, 0, 0\)/.test(bar));
+    if (!barOk) failed++;
+    console.log(`${barOk ? '통과' : '실패'} ${tag}-list 고정 탭 줄 ${bar}`);
+    await page.screenshot({ path: join(out, `${tag}-list-scrolled.png`) });
+    const view = await page.evaluate(() => document.querySelector('a.com-btn')?.href);
+    if (view) await shot(`${tag}-view`, view);
+    else { failed++; console.log(`실패 ${tag} 글 주소를 못 찾음`); }
+  }
+  await cdp.send('Network.setUserAgentOverride', { userAgent: '' });
+  await page.setViewportSize({ width: 1400, height: 900 });
+
   // 아이콘 창에서 고른 값이 열린 인벤 탭에 새로고침 없이 반영되는지(F-04)
   // 압축 해제 확장의 ID는 폴더 절대 경로의 sha256 앞 32자리를 a~p로 바꾼 값이다.
   const id = [...createHash('sha256').update(realpathSync(ext)).digest('hex').slice(0, 32)]
