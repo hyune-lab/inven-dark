@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "인벤 다크 모드 (비공식)",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "인벤(inven.co.kr)에서만 동작하는 다크 모드. 다른 사이트에는 영향 없음, 정보 수집 없음.",
   "permissions": [
     "storage"

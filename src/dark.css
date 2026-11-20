@@ -30,7 +30,9 @@ html[data-inven-dark="on"] body :is(div, section, article, aside, header, nav, f
     .table_wrap > .inventory-section, .table_wrap > .inventory-section *,
     /* 색이 상태를 뜻하는 곳: 로아 지도 메뉴의 켠 항목(파랑)·선택 지역(금색), 아이온2 DB 머리 띠·선택 탭 */
     body.world li.on, body.world li.select,
-    header[class*="aion2-"], [class*="aion2-"] li.on)) {
+    header[class*="aion2-"], [class*="aion2-"] li.on,
+    /* 모바일 전체 메뉴(서랍) 맨 위 빨간 띠, PC 전체 메뉴(퀵링크)의 반투명 덮개와 빨간 머리 띠 */
+    #leftAside .s_h_header, #comHeadQuickLink, #comHeadQuickLink .quickMenu)) {
   background-color: transparent !important;
   border-color: var(--id-border) !important;
 }
@@ -308,7 +310,8 @@ html[data-inven-dark="on"] body .rolling-news span.cate {
 /* 아이온2 1주년 행사(원래 어두운 디자인)의 금색 버튼은 원래 진한 글자 */
 html[data-inven-dark="on"] body a.btn-gold { color: #4c3a21 !important; }
 /* 로아 왼쪽 시간표의 남은 시간(빨강): 바탕이 조금 어두워진 만큼 빨강을 살짝 밝힌다 */
-html[data-inven-dark="on"] body span.remind { color: rgb(255, 110, 110) !important; }
+/* (임박하면 붙는 min1~min3 상태는 인벤 규칙이 더 구체적이라, :is 안의 ID로 우선순위를 올린다) */
+html[data-inven-dark="on"] body :is(#timerLeftContent, body) span.remind.remind { color: rgb(255, 110, 110) !important; }
 
 /* ---- 로그인 상태 화면 ---- */
 /* 글쓰기 화면의 첨부·클립보드·임시저장 버튼: 인벤 글쓰기 전용 규칙(ID 선택자 + !important 흰 바탕)보다 높여 덮는다 */
@@ -334,3 +337,27 @@ html[data-inven-dark="on"][data-inven-m] body :is(.cmdWrap a[class*="bttn"], h1.
 }
 /* 그림 버튼은 표면색 칩 규칙(a[class*="bttn"])이 깐 배경색까지 뒤집히지 않게 투명으로 */
 html[data-inven-dark="on"][data-inven-m] body :is(.cmdWrap a[class*="bttn"], h1.note a.allread) { background-color: transparent !important; }
+/* 모바일 전체 메뉴(햄버거로 여는 왼쪽 서랍): 패널이 투명하면 뒤 목록이 비친다.
+   패널은 표면색, 섹션 머리는 한 단계 다른 표면 + 구분선. 바깥 덮개(a.s_transBg, 반투명 검정)는 원래대로 */
+html[data-inven-dark="on"][data-inven-m] body #leftAside .s_inner { background-color: #1f2026 !important; }
+html[data-inven-dark="on"][data-inven-m] body #leftAside h3 {
+  background-color: var(--id-surface-2) !important;
+  border-top: 1px solid var(--id-border) !important;
+  border-bottom: 1px solid var(--id-border) !important;
+}
+/* PC 상단 메뉴 오른쪽 전체 메뉴 버튼으로 여는 퀵링크 레이어: 흰 패널을 표면색으로(덮개·빨간 머리 띠는 위 예외로 원래대로) */
+html[data-inven-dark="on"] body #comHeadQuickLink .content {
+  background-color: #1f2026 !important;
+  border: 1px solid var(--id-border) !important;
+}
+html[data-inven-dark="on"] body #comHeadQuickLink button.quicklink_close { background-color: transparent !important; filter: invert(0.85); }
+/* 로그인 상태 서랍: 이니/베니 줄 아래 밝은 띠(가상 요소 그라데이션)는 구분선 색으로, 최근 방문한 게시판 "초기화"는 칩으로 */
+html[data-inven-dark="on"][data-inven-m] body #leftAside .s_h_point::after {
+  background-image: none !important;
+  background-color: var(--id-border) !important;
+}
+html[data-inven-dark="on"][data-inven-m] body #bbsHistoryReset {
+  background-color: var(--id-surface-2) !important;
+  border: 1px solid var(--id-border) !important;
+  color: var(--id-text) !important;
+}
