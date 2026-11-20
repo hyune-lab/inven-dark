@@ -309,3 +309,28 @@ html[data-inven-dark="on"] body .rolling-news span.cate {
 html[data-inven-dark="on"] body a.btn-gold { color: #4c3a21 !important; }
 /* 로아 왼쪽 시간표의 남은 시간(빨강): 바탕이 조금 어두워진 만큼 빨강을 살짝 밝힌다 */
 html[data-inven-dark="on"] body span.remind { color: rgb(255, 110, 110) !important; }
+
+/* ---- 로그인 상태 화면 ---- */
+/* 글쓰기 화면의 첨부·클립보드·임시저장 버튼: 인벤 글쓰기 전용 규칙(ID 선택자 + !important 흰 바탕)보다 높여 덮는다 */
+html[data-inven-dark="on"] body .board-write :is(#bbsFileControler a.bttn78WH1, #bbsFileControler a#gameIcon, #clip button, #tempSaveContent td input[type="button"]) {
+  background-color: var(--id-surface-2) !important;
+  border-color: var(--id-border) !important;
+  color: var(--id-text) !important;
+}
+/* 계정 화면의 소셜 로그인 버튼은 브랜드 색 그대로, 글자도 원래 색(네이버 흰색, 카카오 검정) */
+html[data-inven-dark="on"] body div.naver a { color: #fff !important; }
+html[data-inven-dark="on"] body div.kakao a { color: #191919 !important; }
+html[data-inven-dark="on"] body button.btn-info, html[data-inven-dark="on"] body button.btn-info * { color: #fff !important; }
+/* 모바일 맨 위로 버튼 */
+html[data-inven-dark="on"][data-inven-m] body a.goto_top_arrow {
+  background-color: var(--id-surface-2) !important;
+  border-color: var(--id-border) !important;
+}
+/* 모바일 쪽지함(예전 방식 화면): 흰 상자 그림 버튼과 폴더 버튼. 원래 진한 글자를 둔 채 밝기를 뒤집어
+   상자는 어둡게·글자는 밝게 만든다(현재 폴더만 진하게 칠한 원래 구분도 그대로 남는다). */
+html[data-inven-dark="on"][data-inven-m] body :is(.cmdWrap a[class*="bttn"], h1.note a.allread, span.orange > a) {
+  color: #333 !important;
+  filter: invert(0.88) hue-rotate(180deg);
+}
+/* 그림 버튼은 표면색 칩 규칙(a[class*="bttn"])이 깐 배경색까지 뒤집히지 않게 투명으로 */
+html[data-inven-dark="on"][data-inven-m] body :is(.cmdWrap a[class*="bttn"], h1.note a.allread) { background-color: transparent !important; }

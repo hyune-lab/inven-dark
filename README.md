@@ -83,6 +83,8 @@ src/popup.*       아이콘 창
 npm install                # 처음 한 번 (playwright)
 npm test                   # 모드 판정 단위 시험
 node scripts/shoot.mjs     # 확장을 넣은 크로미움으로 인벤 화면 캡처·검사 → shots/
+node scripts/survey.mjs    # 인벤 페이지 종류별 대표 주소(docs/survey-urls.json) 순회 검사 → shots/survey/
+node scripts/login-check.mjs  # (수동) 로그인해 둔 크롬(원격 디버깅 9333)에 붙어 로그인 화면 읽기 전용 검사 → shots/login/
 sh scripts/pack.sh         # 배포용 압축 파일 → dist/
 ```
 
