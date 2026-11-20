@@ -33,7 +33,19 @@ export function contrastIssues(page) {
       let bg = null;
       for (let x = e; x; x = x.parentElement) {
         const s = getComputedStyle(x);
-        if (s.backgroundImage !== 'none') break;
+        if (s.backgroundImage !== 'none') {
+          // 그림(url)이면 색을 알 수 없어 건너뛴다. 그라데이션만이면 그 색 중 가장 밝은 색을 배경으로 본다.
+          if (/url\(/.test(s.backgroundImage)) break;
+          const stops = (s.backgroundImage.match(/rgba?\([^)]*\)/g) || []).map(parse);
+          // 완전히 투명한 구간이 있으면 글자 일부에만 걸친 장식(반쪽 밑줄 등)이라 바탕으로 보지 않는다
+          if (stops.length && !stops.some((c) => c[3] === 0)) {
+            // 반투명 막은 요소 자신의 배경색 위에 섞어 계산하고, 배경색이 없으면 그 구간은 뺀다
+            const base = parse(s.backgroundColor);
+            const mixed = stops.map((c) => (c[3] === undefined || c[3] >= 0.9 ? c.slice(0, 3)
+              : base.length >= 3 && (base[3] === undefined || base[3] >= 0.9) ? c.slice(0, 3).map((v, i) => v * c[3] + base[i] * (1 - c[3])) : null)).filter(Boolean);
+            if (mixed.length) { bg = mixed.reduce((a, b) => (lum(b) > lum(a) ? b : a)); break; }
+          }
+        }
         const c = parse(s.backgroundColor);
         if (c.length >= 3 && (c[3] === undefined || c[3] >= 0.9)) { bg = c.slice(0, 3); break; }
       }
