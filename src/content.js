@@ -24,6 +24,8 @@
     apply();
   }
 
+  // 모바일 인벤 전용 규칙을 PC 인벤에 걸지 않도록 표시해 둔다(dark.css의 [data-inven-m] 규칙).
+  if (location.hostname === 'm.inven.co.kr') document.documentElement.setAttribute('data-inven-m', '');
   apply();
   chrome.storage.sync.get('mode', (items) => setMode(items && items.mode));
   chrome.storage.onChanged.addListener((changes, area) => {

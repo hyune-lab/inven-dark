@@ -43,7 +43,7 @@ html[data-inven-dark="on"] body :is(div, section, article, aside, header, nav, f
 html[data-inven-dark="on"] body :is(input:not([type="image"]):not([type="checkbox"]):not([type="radio"]),
   textarea, select, button):not(:where(.table_wrap > .inventory-section *,
     /* 원래 색으로 역할을 구분하는 버튼(검색 파랑·초기화 주황 등) */
-    button.btn_search, button.searchBtn, button.resetBtn)) {
+    button.btn_search, button.searchBtn, button.resetBtn, button.bttnAct, button.btn_write, button.btn_reset)) {
   background-color: var(--id-surface-2) !important;
   color: var(--id-text) !important;
   border-color: var(--id-border) !important;
@@ -198,7 +198,7 @@ html[data-inven-dark="on"] body figcaption:not(:where(.table_wrap > .inventory-s
   color: var(--id-muted) !important;
 }
 /* 색깔 말머리 칩(유머·연예·이슈 등)과 현재 쪽 번호: 색조는 살리고 검은 막을 덧씌워 흰 글자 대비 확보 */
-html[data-inven-dark="on"] body :is(span.cate, span.currentpg, td > span.type,
+html[data-inven-dark="on"] body :is(span.cate:not(:where(.rolling-news *)), span.currentpg, td > span.type,
   button.btn_search, button.searchBtn, button.resetBtn, body.world li.on, body.world li.select,
   span.calendar__event-sort, li.item:is(.no1, .no2, .no3) > span, a.common-btn, form.norecom a.submit,
   a.link-store, a.inven-youtube-subscribe, .hotdeal-view div.title > span, div.title > span[class=""]) {
@@ -235,3 +235,77 @@ html[data-inven-dark="on"] body #powerbbsContent span:is([style*="#ffffff" i], [
   background-color: transparent !important;
   color: var(--id-text) !important;
 }
+
+/* ---- 모바일 인벤(m.inven.co.kr, content.js가 html에 data-inven-m을 붙임) ---- */
+/* 게시판 위 탭 줄(자게·10추·30추…): 스크롤하면 위에 고정(.fix)되므로 불투명하게. 선택 표시가 있으면 흰 막대 대신 은은한 파랑 밑줄 */
+html[data-inven-dark="on"][data-inven-m] body section.tab-navi {
+  background-color: var(--id-bg) !important;
+  border-bottom: 1px solid var(--id-border) !important;
+}
+html[data-inven-dark="on"][data-inven-m] body section.tab-navi li:is(.on, .active, .selected) a,
+html[data-inven-dark="on"][data-inven-m] body section.tab-navi a:is(.on, .active, .selected) {
+  color: var(--id-text) !important;
+  box-shadow: inset 0 -2px 0 var(--id-link);
+}
+html[data-inven-dark="on"][data-inven-m] body section.tab-navi :is([class*="bar"], [class*="indicator"]) {
+  background-color: var(--id-link) !important;
+  opacity: 0.7;
+}
+/* 글 목록 오른쪽 댓글 수 상자: 원래 0과 1 이상의 색 구분은 없음(둘 다 굵은 숫자 + 회색 "댓글") */
+html[data-inven-dark="on"][data-inven-m] body a.com-btn {
+  background-color: var(--id-surface-2) !important;
+  border: 1px solid var(--id-border) !important;
+}
+html[data-inven-dark="on"][data-inven-m] body a.com-btn .num { color: var(--id-text) !important; font-weight: 700; }
+html[data-inven-dark="on"][data-inven-m] body a.com-btn .txt { color: var(--id-muted) !important; }
+/* 밝은 칸·받침: 게임 첫 화면 탭 칩, 썸네일 받침, 아이마트 카드, 말풍선 목록, 쪽 번호, 맨 위로 버튼 */
+html[data-inven-dark="on"][data-inven-m] body :is(ul.tab.flex > li > a, span.img-box, span.news-thumbnail-thumb,
+  span.thumb_img, .common-card-list > li > a, ul.bubble-list-ul > li > a, a.swiper-slide, div.le > a, a.pg, a.gototop,
+  span.m-news-hero__avatar, ul.swipetabs > li > a, #sticker-list > li > a, span.news-interview-thumb, span.news-review-thumb,
+  a.more, span.moreText) {
+  background-color: var(--id-surface-2) !important;
+  border-color: var(--id-border) !important;
+}
+/* 선택된 탭·현재 쪽 번호는 한 단계 밝은 칩으로 구분 */
+html[data-inven-dark="on"][data-inven-m] body :is(ul.tab.flex > li.on > a, ul.swipetabs > li.on > a, a.pg.currentpg) {
+  background-color: #3a3d48 !important;
+  color: var(--id-text) !important;
+}
+html[data-inven-dark="on"][data-inven-m] body :is(section.mo-top-func, h2)::after { background-color: var(--id-border) !important; }
+html[data-inven-dark="on"][data-inven-m] body :is(span.hot-recom-label, span.hot-deal-label, span.timeLimit) {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)) !important;
+  color: #fff !important;
+}
+/* 원래 흰 글자를 쓰는 색 버튼(웹진 머리 띠 파랑, 핫딜 바로가기 빨강): 흰 글자 되돌리면 5:1 이상 */
+html[data-inven-dark="on"][data-inven-m] body :is(.headlink_sub a, .headlink_sub a *, #ibuilder-game-hotdeal-title a) { color: #fff !important; }
+/* 순위 칩(노랑)은 색이 의미라 바탕은 두고 원래처럼 진한 글자 */
+html[data-inven-dark="on"][data-inven-m] body span.olderRanking { color: #222 !important; }
+/* 댓글 화면 맨 위 "[본문 보기]" 전체 폭 버튼: 밝은 그라데이션을 걷고 다른 버튼과 같은 칩으로 */
+html[data-inven-dark="on"] body a.lineMenuType1 {
+  background-image: none !important;
+  background-color: var(--id-surface-2) !important;
+  border: 1px solid var(--id-border) !important;
+  color: var(--id-text) !important;
+}
+html[data-inven-dark="on"] body a.lineMenuType1:hover { background-color: #3a3d48 !important; }
+
+/* ---- 그라데이션 배경(검사기가 그라데이션도 보게 되며 드러난 곳) ---- */
+/* 원래 흰 글자를 쓰는 색 버튼·칸: 글자를 원래 흰색으로(밝은 회색으로 덮으면 원래보다 대비가 떨어진다) */
+html[data-inven-dark="on"] body :is(.quest_list li a, .avatar_list li .txt) {
+  color: #fff !important;
+}
+html[data-inven-dark="on"][data-inven-m] body :is(a.checkButton, a.checkButton2, span.countNum, span.countNum *) { color: #fff !important; }
+/* 원래 어두운 글자를 쓰는 밝은 그라데이션 칸: 그라데이션을 걷어 어두운 바탕으로 */
+html[data-inven-dark="on"] body :is(table.tablesorter thead, .titleWrap > .title, #sc-user-panel .column, section.ao-dday) {
+  background-image: none !important;
+}
+html[data-inven-dark="on"][data-inven-m] body a.game-product { background-image: none !important; }
+/* 로아 첫 화면 롤링 뉴스의 말머리는 연회색 칩(색깔 칩 아님) */
+html[data-inven-dark="on"] body .rolling-news span.cate {
+  background-color: var(--id-surface-2) !important;
+  color: var(--id-muted) !important;
+}
+/* 아이온2 1주년 행사(원래 어두운 디자인)의 금색 버튼은 원래 진한 글자 */
+html[data-inven-dark="on"] body a.btn-gold { color: #4c3a21 !important; }
+/* 로아 왼쪽 시간표의 남은 시간(빨강): 바탕이 조금 어두워진 만큼 빨강을 살짝 밝힌다 */
+html[data-inven-dark="on"] body span.remind { color: rgb(255, 110, 110) !important; }
