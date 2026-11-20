@@ -91,6 +91,7 @@ export function whiteElements(page, limit = 12) {
     for (const e of document.querySelectorAll('body *')) {
       if (e.closest('img, video, canvas, iframe, svg, .media-partnership, .partner-list')) continue; // 협력사 로고 칸은 일부러 흰 바탕 유지
       const cs = getComputedStyle(e);
+      if (cs.filter.includes('invert')) continue; // 밝기를 뒤집어 어둡게 만든 요소
       const m = (cs.backgroundColor.match(/[\d.]+/g) || []).map(Number);
       if (m.length < 3 || (m[3] !== undefined && m[3] < 0.5)) continue;
       const L = (0.2126 * m[0] + 0.7152 * m[1] + 0.0722 * m[2]) / 255;
