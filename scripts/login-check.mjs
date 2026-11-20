@@ -56,24 +56,42 @@ async function check(name) {
   for (const w of whites.slice(0, 5)) console.log('  흰', w.size, w.bg, w.sel);
 }
 
-// 마우스를 올리거나 펼친 뒤 새로 보이게 된 절대위치·고정 글자 레이어가 투명하면 실패(shoot.mjs와 같은 기준)
-const markVisible = () => page.evaluate(() => { window.__idVis = new Set([...document.querySelectorAll('body *')].filter((e) => e.getClientRects().length)); });
+// 마우스를 올리거나 메뉴를 연 뒤 화면 안에 새로 들어온 절대위치·고정 글자 레이어가 투명하면 실패(shoot.mjs와 같은 기준)
+const markVisible = () => page.evaluate(() => {
+  const inView = (e) => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && r.right > 0 && r.bottom > 0 && r.left < innerWidth && r.top < innerHeight; };
+  window.__idInView = inView;
+  window.__idVis = new Set([...document.querySelectorAll('body *')].filter(inView));
+});
 async function layerCheck(name) {
   const bad = await page.evaluate(() => {
     const seen = window.__idVis || new Set();
     const opaque = (e) => { const s = getComputedStyle(e); const m = (s.backgroundColor.match(/[\d.]+/g) || []).map(Number); return s.backgroundImage !== 'none' || (m.length >= 3 && (m[3] === undefined || m[3] >= 0.95)); };
-    const fresh = [...document.querySelectorAll('body *')].filter((e) => !seen.has(e) && e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden' && /absolute|fixed/.test(getComputedStyle(e).position));
-    const set = new Set(fresh);
-    return fresh.filter((e) => {
-      if (set.has(e.parentElement) || e.textContent.trim().length < 2) return false;
+    const freshAll = [...document.querySelectorAll('body *')].filter((e) => !seen.has(e) && window.__idInView(e) && !e.closest('[class*="swiper"], [class*="roll"]'));
+    const set = new Set(freshAll);
+    const fresh = freshAll.filter((e) => { const s = getComputedStyle(e); return !set.has(e.parentElement) && s.visibility !== 'hidden' && /absolute|fixed/.test(s.position); });
+    const ok = (e) => {
+      if (e.textContent.trim().length < 2) return true;
       const r = e.getBoundingClientRect(); const area = r.width * r.height;
-      if (area < 2000) return false;
-      return !(opaque(e) || [...e.querySelectorAll('*')].some((d) => { const q = d.getBoundingClientRect(); return q.width * q.height >= 0.9 * area && opaque(d); }));
-    }).map((e) => `${e.tagName.toLowerCase()}.${[...e.classList].join('.')}`);
+      if (area < 2000) return true;
+      if (opaque(e) || [...e.querySelectorAll('*')].some((d) => { const q = d.getBoundingClientRect(); return q.width * q.height >= 0.9 * area && opaque(d); })) return true;
+      const a = (getComputedStyle(e).backgroundColor.match(/[\d.]+/g) || []).map(Number)[3];
+      return a >= 0.5 && [...e.children].every(ok);
+    };
+    return fresh.filter((e) => !ok(e)).map((e) => `${e.tagName.toLowerCase()}.${[...e.classList].join('.')}`);
   });
   if (bad.length) failed++;
   console.log(`${bad.length ? '실패' : '통과'} 레이어 ${name}${bad.length ? ': ' + bad.join(', ') : ''}`);
   await page.screenshot({ path: join(out, `layer-${name}.png`) });
+}
+
+// 클릭으로 여는 메뉴(햄버거·전체 메뉴): 메뉴를 여는 버튼만 누른다(javascript: 링크라도 메뉴 열기는 허용)
+async function menuCheck(name, selector) {
+  const btn = await page.$(selector);
+  if (!btn) { console.log(`메뉴 ${name} 버튼 없음`); return; }
+  await page.evaluate(() => window.scrollTo(0, 0)); await page.waitForTimeout(300);
+  await markVisible(); await btn.click(); await page.waitForTimeout(1000);
+  await layerCheck(`menu-${name}`);
+  await page.keyboard.press('Escape');
 }
 
 async function setMobile(on) {
@@ -85,7 +103,10 @@ async function setMobile(on) {
 const findHref = (test) => page.evaluate((src) => { const f = new Function('a', `return ${src}`); return [...document.querySelectorAll('a[href]')].find((a) => /^https?:/.test(a.href) && !/write/i.test(a.href.split('?')[1] || '') && f(a))?.href || null; }, test);
 
 const steps = {
-  async pcMain() { await open('https://www.inven.co.kr/'); await check('pc-main'); },
+  async pcMain() {
+    await open('https://www.inven.co.kr/'); await check('pc-main');
+    await open('https://www.inven.co.kr/board/lostark/6271'); await menuCheck('pc-all-menu', 'header.community-header button.btn-all');
+  },
   async pcList() {
     await open('https://www.inven.co.kr/board/lostark/6271');
     await check('pc-list');
@@ -131,6 +152,8 @@ const steps = {
     try {
       await open('https://m.inven.co.kr/'); await check('m-main');
       await open('https://m.inven.co.kr/board/lostark/6271'); await check('m-list');
+      await menuCheck('m-hamburger', 'a#bttnCommunity');
+      await open('https://m.inven.co.kr/board/lostark/6271');
       // 글쓰기 버튼은 목록 화면에 있다(열어서 보기만)
       const write = await page.evaluate(() => [...document.querySelectorAll('a[href]')].find((a) => /^https?:\/\/m\.inven/.test(a.href) && /query=write|\/write|mode=write/i.test(a.href))?.href || null);
       const view = await page.evaluate(() => document.querySelector('a.com-btn')?.href);

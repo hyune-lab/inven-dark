@@ -55,30 +55,56 @@ async function fixedCheck(name) {
   console.log(`${bad.length ? '실패' : '통과'} 고정 요소 불투명 ${name}${bad.length ? ': ' + bad.join(', ') : ''}`);
 }
 
-// 마우스를 올리기 전에 보이던 요소를 기억해 두고, 올린 뒤 새로 보이게 된 절대위치·고정 글자 레이어가
-// 투명하면 실패로 센다(뒤 내용과 겹쳐 안 읽힘). 자신이나 거의 같은 크기의 자식이 불투명해야 한다.
+// 마우스를 올리거나 메뉴 버튼을 누르기 전에 화면 안에 보이던 요소를 기억해 두고, 그 뒤 화면 안에 새로 들어온
+// 절대위치·고정 글자 레이어가 투명하면 실패로 센다(뒤 내용과 겹쳐 안 읽힘). 자신이나 거의 같은 크기의 자식이 불투명해야 한다.
+// '화면 안' 기준이라 숨어 있다 나타나는 펼침뿐 아니라 화면 밖에서 밀려 들어오는 서랍 메뉴도 잡는다.
 const markVisible = () => page.evaluate(() => {
-  window.__invenDarkVisible = new Set([...document.querySelectorAll('body *')].filter((e) => e.getClientRects().length));
+  const inView = (e) => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && r.right > 0 && r.bottom > 0 && r.left < innerWidth && r.top < innerHeight; };
+  window.__invenDarkInView = inView;
+  window.__invenDarkVisible = new Set([...document.querySelectorAll('body *')].filter(inView));
 });
 async function newLayerCheck(name) {
   const bad = await page.evaluate(() => {
     const seen = window.__invenDarkVisible || new Set();
     const opaque = (e) => { const s = getComputedStyle(e); const m = (s.backgroundColor.match(/[\d.]+/g) || []).map(Number); return s.backgroundImage !== 'none' || (m.length >= 3 && (m[3] === undefined || m[3] >= 0.95)); };
-    const fresh = [...document.querySelectorAll('body *')].filter((e) => {
-      if (seen.has(e) || !e.getClientRects().length) return false;
-      const s = getComputedStyle(e);
-      return s.visibility !== 'hidden' && (s.position === 'absolute' || s.position === 'fixed');
-    });
-    const freshSet = new Set(fresh);
-    return fresh.filter((e) => {
-      if (freshSet.has(e.parentElement) || e.textContent.trim().length < 2) return false; // 새 레이어의 맨 바깥만 본다
+    // 시간에 따라 돌아가는 롤링·스와이퍼 항목은 레이어가 아니다
+    const freshAll = [...document.querySelectorAll('body *')].filter((e) => !seen.has(e) && window.__invenDarkInView(e) && !e.closest('[class*="swiper"], [class*="roll"]'));
+    const freshSet = new Set(freshAll);
+    // 새 레이어의 맨 바깥(부모는 원래 화면에 있던 요소)만, 그중 절대위치·고정인 것만 본다
+    const fresh = freshAll.filter((e) => { const s = getComputedStyle(e); return !freshSet.has(e.parentElement) && s.visibility !== 'hidden' && (s.position === 'absolute' || s.position === 'fixed'); });
+    // 레이어가 괜찮은 조건: 자신이나 거의 같은 크기의 자식이 불투명. 화면을 덮는 반투명 덮개(알파 0.5 이상)라면
+    // 그 안의 글자 있는 자식 패널들이 각각 이 조건을 만족하면 된다.
+    const ok = (e) => {
+      if (e.textContent.trim().length < 2) return true;
       const r = e.getBoundingClientRect();
       const area = r.width * r.height;
-      if (area < 2000) return false;
-      return !(opaque(e) || [...e.querySelectorAll('*')].some((d) => { const q = d.getBoundingClientRect(); return q.width * q.height >= 0.9 * area && opaque(d); }));
-    }).map((e) => `${e.tagName.toLowerCase()}.${[...e.classList].join('.')}`);
+      if (area < 2000) return true;
+      if (opaque(e) || [...e.querySelectorAll('*')].some((d) => { const q = d.getBoundingClientRect(); return q.width * q.height >= 0.9 * area && opaque(d); })) return true;
+      const a = (getComputedStyle(e).backgroundColor.match(/[\d.]+/g) || []).map(Number)[3];
+      return a >= 0.5 && [...e.children].every(ok);
+    };
+    return fresh.filter((e) => !ok(e)).map((e) => `${e.tagName.toLowerCase()}.${[...e.classList].join('.')}`);
   });
   if (bad.length) { failed++; console.log(`실패 떠 있는 글자 레이어 투명 ${name}: ${bad.join(', ')}`); }
+}
+
+// 클릭으로 여는 메뉴(모바일 햄버거, PC 전체 메뉴 버튼): 눌러서 연 뒤 새로 화면에 들어온 레이어가 불투명한지 본다.
+// 메뉴를 여는 버튼만 누른다(javascript: 링크라도 메뉴 열기는 허용, 글쓰기 같은 동작 링크는 누르지 않는다).
+async function menuCheck(name, selector) {
+  const btn = await page.$(selector);
+  if (!btn) { failed++; console.log(`실패 메뉴 ${name} 버튼(${selector})을 못 찾음`); return; }
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForTimeout(300);
+  await markVisible();
+  await btn.click();
+  await page.waitForTimeout(1000);
+  const before = failed;
+  await newLayerCheck(`메뉴 ${name}`);
+  console.log(`${failed === before ? '통과' : '실패'} 메뉴 ${name} 연 뒤 새 레이어 불투명`);
+  await page.screenshot({ path: join(out, `menu-${name}.png`) });
+  await page.keyboard.press('Escape');
+  await page.reload({ waitUntil: 'load' }); // 열린 메뉴를 닫은 상태로 되돌린다
+  await page.waitForTimeout(800);
 }
 
 // 목록 제목에 마우스를 올리면 뜨는 본문 미리보기(.boardPreview)를 확인한다.
@@ -169,6 +195,7 @@ try {
   await page.goto(boards[1][1], { waitUntil: 'load', timeout: 30000 });
   await page.waitForTimeout(1000);
   await hoverShots('gnb', 'ul.main-menu-list > li:has(.sub-menu-wrap)', '.sub-menu-wrap');
+  await menuCheck('pc-all-menu', 'header.community-header button.btn-all');
   await hoverShots('maple-menu', '#commu-nav li.system:has(> ol)', ':scope > ol');
 
   for (const [name, url] of boards) {
@@ -244,6 +271,7 @@ try {
       await cdp.send('Network.setUserAgentOverride', { userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1' });
     }
     await shot(`${tag}-list`, 'https://m.inven.co.kr/board/lostark/6271');
+    await menuCheck(`${tag}-hamburger`, 'a#bttnCommunity');
     await page.evaluate(() => window.scrollTo(0, 700));
     await page.waitForTimeout(800);
     await fixedCheck(`${tag}-list 스크롤 700`);
