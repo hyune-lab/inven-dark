@@ -398,5 +398,120 @@
     "group": "D",
     "url": "https://party.inven.co.kr/hotdeal/view/198080",
     "key": "party.inven.co.kr/{party}/view/#?"
+  },
+  {
+    "group": "M",
+    "url": "https://m.inven.co.kr/board/lostark/6271",
+    "key": "m/board/list"
+  },
+  {
+    "group": "M",
+    "url": "https://m.inven.co.kr/board/lostark/6271?my=chu",
+    "key": "m/board/list"
+  },
+  {
+    "group": "M",
+    "url": "https://m.inven.co.kr/",
+    "key": "m.inven.co.kr/?"
+  },
+  {
+    "group": "M",
+    "url": "https://m.inven.co.kr/lostark/",
+    "key": "m/{game}"
+  },
+  {
+    "group": "M",
+    "url": "https://m.inven.co.kr/aion2/",
+    "key": "m/{game}"
+  },
+  {
+    "group": "M",
+    "url": "https://m.inven.co.kr/wow/",
+    "key": "m/{game}"
+  },
+  {
+    "group": "M",
+    "url": "https://m.inven.co.kr/black/",
+    "key": "m/{game}"
+  },
+  {
+    "group": "M",
+    "url": "https://m.inven.co.kr/common/sitemap.php",
+    "key": "m.inven.co.kr/common/sitemap.php?"
+  },
+  {
+    "group": "M",
+    "url": "https://m.inven.co.kr/board/lostark/6271/4324086",
+    "key": "m/board/view"
+  },
+  {
+    "group": "M",
+    "url": "https://m.inven.co.kr/board/lostark/6271/4324077",
+    "key": "m/board/view"
+  },
+  {
+    "group": "M",
+    "url": "https://m.inven.co.kr/setting.php",
+    "key": "m.inven.co.kr/setting.php?"
+  },
+  {
+    "group": "M",
+    "url": "https://m.inven.co.kr/webzine/wznews.php?site=lostark",
+    "key": "m.inven.co.kr/webzine/wznews.php?site"
+  },
+  {
+    "group": "M",
+    "url": "https://m.inven.co.kr/imart/",
+    "key": "m.inven.co.kr/imart?"
+  },
+  {
+    "group": "M",
+    "url": "https://m.inven.co.kr/imart/shop/",
+    "key": "m.inven.co.kr/imart/shop?"
+  },
+  {
+    "group": "M",
+    "url": "https://m.inven.co.kr/imart/event/?type=2",
+    "key": "m.inven.co.kr/imart/event?type"
+  },
+  {
+    "group": "M",
+    "url": "https://m.inven.co.kr/imart/pointmall/draw/",
+    "key": "m.inven.co.kr/imart/pointmall/draw?"
+  },
+  {
+    "group": "M",
+    "url": "https://m.inven.co.kr/imart/attendance/",
+    "key": "m.inven.co.kr/imart/attendance?"
+  },
+  {
+    "group": "M",
+    "url": "https://m.inven.co.kr/imart/specialpoint/",
+    "key": "m.inven.co.kr/imart/specialpoint?"
+  },
+  {
+    "group": "M",
+    "url": "https://m.inven.co.kr/imart/imarble/",
+    "key": "m.inven.co.kr/imart/imarble?"
+  },
+  {
+    "group": "M",
+    "url": "https://m.inven.co.kr/webzine/wznews.php?idx=323630",
+    "key": "m.inven.co.kr/webzine/wznews.php?idx"
+  },
+  {
+    "group": "M",
+    "url": "https://m.inven.co.kr/party/",
+    "key": "m.inven.co.kr/party?"
+  },
+  {
+    "group": "M",
+    "url": "https://m.inven.co.kr/webzine/wznews.php",
+    "key": "m.inven.co.kr/webzine/wznews.php?"
+  },
+  {
+    "group": "M",
+    "url": "https://m.inven.co.kr/board/lostark/6271/4324224?c=4324224",
+    "key": "m/board/comment"
   }
 ]

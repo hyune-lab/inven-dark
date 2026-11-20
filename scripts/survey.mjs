@@ -1,6 +1,8 @@
 // 인벤 여러 종류의 페이지를 돌며 다크 적용 상태를 검사한다.
-// 사용: node scripts/survey.mjs [--collect] [--only=A,B] [--match=문자열]
+// 사용: node scripts/survey.mjs [--collect | --collect-mobile] [--only=A,B] [--match=문자열]
 //  - --collect: 메인·서비스 첫 화면 링크에서 종류별 대표 주소를 모아 docs/survey-urls.json에 저장만 한다(없으면 검사 전에 자동으로).
+//  - --collect-mobile: 모바일 인벤(m.inven.co.kr) 대표 주소를 모아 묶음 M으로 목록에 더한다(기존 M은 바꿈).
+//  - 묶음 M은 PC 창 폭(1400)과 휴대폰 폭(390, 모바일 흉내) 두 가지로 검사한다.
 //  - 페이지마다 글자 대비, 밝은 바탕 비율(사진·영상 제외), 큰 흰 요소를 재고 shots/survey/에 캡처와 보고서를 남긴다.
 // 읽기만 한다(로그인·글쓰기·투표 금지). 요청은 한 번에 하나, 페이지 사이 2.5초 쉰다.
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -26,8 +28,9 @@ async function visit(url) {
   await page.waitForTimeout(1200);
 }
 
-// 행동이 일어나거나(로그인·글쓰기·투표 등) 범위 밖(모바일)이거나 검색 결과 대량 순회가 되는 주소는 뺀다.
-const SKIP = /login|logout|member\/|mypage|write|modify|delete|vote|search|javascript:|\.(jpg|png|gif|zip|exe)$|m\.inven|\/mobile|act=|query=|bbsadmin|note\//i;
+// 행동이 일어나거나(로그인·글쓰기·투표 등) 검색 결과 대량 순회가 되는 주소는 뺀다. PC 목록에서는 모바일 주소도 뺀다.
+const ACTION = /login|logout|member\/|mypage|write|modify|delete|vote|search|javascript:|\.(jpg|png|gif|zip|exe)$|act=|query=|bbsadmin|note\//i;
+const SKIP = new RegExp(`${ACTION.source}|m\\.inven|\\/mobile`, 'i');
 const NON_GAME_HOST = /^(www|imart|it|pc|m|static|upload\d*|member|gamezone|store|live|webzine|news|event|ad|cdn|shop|game|gamecalendar|chat|tv|pick)\./;
 const GAME_SKIP = new Set(['board', 'webzine', 'common', 'member', 'search', 'event', 'imart', 'gamezone', 'gamecalendar', 'live', 'store']);
 
@@ -92,21 +95,81 @@ async function collect() {
   return list;
 }
 
+// 모바일 인벤: 메인과 그 안의 첫 화면들에서 링크를 모아 종류별로 고른다(22곳까지).
+// 게임 첫 화면(m.inven.co.kr/게임)은 한 종류로 묶어 4곳, 게시판 목록·글 보기는 2곳, 나머지는 1곳씩.
+async function collectMobile() {
+  const seen = new Map();
+  const mkey = (u) => {
+    const segs = u.pathname.split('/').filter(Boolean);
+    if (segs.length === 1 && !/\./.test(segs[0]) && !['webzine', 'party', 'imart', 'common', 'board'].includes(segs[0])) return 'm/{game}';
+    if (segs[0] === 'board') return `m/board/${segs.length >= 4 ? 'view' : 'list'}`; // 쪽 번호·말머리 같은 질의는 같은 화면
+    if (u.searchParams.has('idx')) return `${keyOf(u).split('?')[0]}?idx`; // 뉴스 기사
+    return keyOf(u);
+  };
+  const add = (href) => {
+    let u;
+    try { u = new URL(href); } catch { return; }
+    if (u.hostname !== 'm.inven.co.kr' || ACTION.test(href)) return;
+    u.hash = '';
+    u.protocol = 'https:';
+    if (!u.pathname.endsWith('/') && !/\.\w+$/.test(u.pathname) && u.pathname.split('/').filter(Boolean).length === 1) u.pathname += '/';
+    const k = mkey(u);
+    const list = seen.get(k) || [];
+    if (!list.includes(u.href)) list.push(u.href);
+    seen.set(k, list);
+  };
+  // 사용자가 알려 준 로아 자유게시판 목록을 맨 앞에
+  const starts = ['https://m.inven.co.kr/board/lostark/6271', 'https://m.inven.co.kr/'];
+  starts.forEach(add);
+  for (const start of starts) { await visit(start); (await links()).forEach(add); }
+  const roots = [...new Set([...seen.values()].flat())].filter((h) => new URL(h).pathname.split('/').filter(Boolean).length <= 1).slice(0, 10);
+  for (const r of roots) {
+    try { await visit(r); (await links()).forEach(add); console.log(`모음 ${r}`); } catch (e) { console.log(`건너뜀 ${r} ${e.message.split('\n')[0]}`); }
+  }
+  const items = [];
+  for (const [k, urls] of seen) {
+    const take = k === 'm/{game}' ? 4 : /\/board\//.test(k) ? 2 : 1;
+    for (const url of urls.slice(0, take)) if (items.length < 22) items.push({ group: 'M', url, key: k });
+  }
+  const old = existsSync(listFile) ? JSON.parse(readFileSync(listFile, 'utf8')).filter((it) => it.group !== 'M') : [];
+  writeFileSync(listFile, JSON.stringify([...old, ...items], null, 2) + '\n');
+  console.log(`모바일 주소 ${items.length}곳 추가: ${listFile}`);
+}
+
+// 휴대폰 폭 흉내: 창 크기와 함께 모바일 기기·터치·사용자 에이전트를 맞춘다
+const cdp = await ctx.newCDPSession(page);
+async function setMobile(on) {
+  if (on) {
+    await cdp.send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
+    await cdp.send('Emulation.setTouchEmulationEnabled', { enabled: true });
+    await cdp.send('Network.setUserAgentOverride', { userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1' });
+  } else {
+    await cdp.send('Emulation.clearDeviceMetricsOverride');
+    await cdp.send('Emulation.setTouchEmulationEnabled', { enabled: false });
+    await cdp.send('Network.setUserAgentOverride', { userAgent: '' });
+  }
+}
+
 try {
-  const collectOnly = args.includes('--collect'); // 목록만 새로 만든다
-  let list = collectOnly || !existsSync(listFile) ? await collect() : JSON.parse(readFileSync(listFile, 'utf8'));
+  const collectOnly = args.includes('--collect') || args.includes('--collect-mobile'); // 목록만 새로 만든다
+  let list = args.includes('--collect') || !existsSync(listFile) ? await collect() : JSON.parse(readFileSync(listFile, 'utf8'));
+  if (args.includes('--collect-mobile')) await collectMobile();
   if (collectOnly) list = [];
+  // 묶음 M은 PC 폭과 휴대폰 폭 두 번 검사한다
+  list = list.flatMap((it) => (it.group === 'M' ? [{ ...it, mobile: false }, { ...it, mobile: true }] : [it]));
   if (only.length) list = list.filter((it) => only.includes(it.group));
   if (match) list = list.filter((it) => it.url.includes(match));
   const report = [];
   for (const [i, it] of list.entries()) {
-    const name = `${it.group}-${String(i).padStart(2, '0')}`;
+    const name = `${it.group}-${String(i).padStart(2, '0')}${it.group === 'M' ? (it.mobile ? '-m' : '-pc') : ''}`;
     try {
+      if (it.group === 'M') await setMobile(it.mobile);
       await visit(it.url);
       const attr = await page.evaluate(() => document.documentElement.getAttribute('data-inven-dark'));
       // 아주 긴 페이지는 위쪽 6000px만 본다(캡처 크기·시간 제한)
       const height = await page.evaluate(() => Math.min(document.documentElement.scrollHeight, 6000));
-      const png = await page.screenshot({ path: join(out, `${name}.png`), fullPage: true, clip: { x: 0, y: 0, width: 1400, height } });
+      const width = await page.evaluate(() => window.innerWidth);
+      const png = await page.screenshot({ path: join(out, `${name}.png`), fullPage: true, clip: { x: 0, y: 0, width, height } });
       const bright = await brightRatio(ctx, page, png);
       const contrast = await contrastIssues(page);
       const whites = await whiteElements(page);
